@@ -26,6 +26,8 @@ namespace server.Controllers
         {
             UserPost post = db.UserPosts
                 .Include(x=>x.User.Image)
+                .Include(x=>x.Post.PostAttachements)
+                .ThenInclude(x=>x.File)
                 .Include(x=>x.Post.PostComments)
                 .ThenInclude(x=>x.Comment.User.Image)
                 .Include(x=>x.Post.PostLikes)
@@ -47,6 +49,8 @@ namespace server.Controllers
         {
             GroupPost post = db.GroupPosts
                 .Include(x => x.Group.GroupImage)
+                .Include(x => x.Post.PostAttachements)
+                .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
                 .Include(x => x.Post.PostLikes)
@@ -68,6 +72,8 @@ namespace server.Controllers
         {
             List<UserPost> userPosts = db.UserPosts
                 .Include(x => x.User.Image)
+                .Include(x => x.Post.PostAttachements)
+                .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
                 .Include(x => x.Post.PostLikes)
@@ -92,6 +98,8 @@ namespace server.Controllers
         {
             List<GroupPost> groupPosts = db.GroupPosts
                 .Include(x => x.Group.GroupImage)
+                .Include(x => x.Post.PostAttachements)
+                .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
                 .Include(x => x.Post.PostLikes)
@@ -107,6 +115,10 @@ namespace server.Controllers
             }
             return Json(returnPosts);
         }
+
+
+        //создание поста пользователя
+        //при этом все вложения в посте загружаются отдельным запросом на сервер, сюда идут только ID этих вложений
         [HttpPost("[action]")]
 
         public async Task<IActionResult> CreateUserPost(PostCreateViewModel newPost)

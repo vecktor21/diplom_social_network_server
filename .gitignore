@@ -2,6 +2,7 @@
 .vs/*
 bin/*
 obj/*
-wwwroot/*
-!wwwroot/**/default_avatar.png
-!!wwwroot/**/default_group_image.png
+wwwroot/files/documents/*
+wwwroot/files/videos/*
+wwwroot/files/images/*
+!wwwroot/files/images/default*.png
