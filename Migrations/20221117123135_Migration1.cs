@@ -887,7 +887,7 @@ namespace server.Migrations
                         column: x => x.LikeId,
                         principalTable: "Likes",
                         principalColumn: "LikeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -939,7 +939,7 @@ namespace server.Migrations
                         column: x => x.CommentId,
                         principalTable: "Comments",
                         principalColumn: "CommentId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -965,7 +965,7 @@ namespace server.Migrations
                         column: x => x.LikeId,
                         principalTable: "Likes",
                         principalColumn: "LikeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.InsertData(
