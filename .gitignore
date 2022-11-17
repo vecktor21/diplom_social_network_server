@@ -1,0 +1,7 @@
+.git/*
+.vs/*
+bin/*
+obj/*
+wwwroot/*
+!wwwroot/**/default_avatar.png
+!!wwwroot/**/default_group_image.png
