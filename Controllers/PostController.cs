@@ -64,7 +64,7 @@ namespace server.Controllers
 
 
         //получить все посты пользователя
-        [HttpGet("group/[action]/{userId}")]
+        [HttpGet("user/[action]/{userId}")]
         public IActionResult GetUserPosts(int userId)
         {
             List<UserPost> userPosts = db.UserPosts
@@ -116,7 +116,7 @@ namespace server.Controllers
 
         //создание поста пользователя
         //при этом все вложения в посте загружаются отдельным запросом на сервер, сюда идут только ID этих вложений
-        [HttpPost("[action]")]
+        [HttpPost("user/[action]")]
 
         public async Task<IActionResult> CreateUserPost(PostCreateViewModel newPost)
         {
@@ -161,7 +161,7 @@ namespace server.Controllers
 
         //создание поста группы
         //при этом все вложения в посте загружаются отдельным запросом на сервер, сюда идут только ID этих вложений
-        [HttpPost("[action]")]
+        [HttpPost("group/[action]")]
         public async Task<IActionResult> CreateGroupPost(PostCreateViewModel newPost)
         {
             try
@@ -210,7 +210,7 @@ namespace server.Controllers
             {
                 i.Replies.Add(publicationService.FindCommentReplies(i));
             }
-            postViewModel.PostType = "group";
+            postViewModel.PostType = "user";
             return postViewModel;
         }
         private PostViewModel TransformToPostViewModel(GroupPost groupPost)

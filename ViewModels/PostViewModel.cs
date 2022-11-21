@@ -12,7 +12,7 @@ namespace server.ViewModels
         public DateTime PublicationDate { get; set; }
         public List<CommentViewModel> Comments { get; set; }
         public List<LikesViewModel> Likes { get; set; }
-        public List<AttachmentViewModel> PostAttachements { get; set; }
+        public List<AttachmentViewModel> PostAttachments { get; set; }
 
         public PostViewModel(UserPost userPost)
         {
@@ -29,11 +29,12 @@ namespace server.ViewModels
                 LikeId = x.LikeId,
                 ObjectId = x.PostId
             }).ToList();
-            this.PostAttachements = post.PostAttachements.Select(x=>new AttachmentViewModel
+            this.PostAttachments = post.PostAttachements.Select(x=>new AttachmentViewModel
             {
-                AttachmentId = x.FileId,
+                attachmentId = x.FileId,
                 fileLink = x.File.FileLink,
-                fileType = x.File.FileType
+                fileType = x.File.FileType,
+                fileName = x.File.LogicalName
             }).ToList();
 
             this.Author = new AuthorViewModel
@@ -65,9 +66,9 @@ namespace server.ViewModels
                 LikeId = x.LikeId,
                 ObjectId = x.PostId
             }).ToList();
-            this.PostAttachements = post.PostAttachements.Select(x => new AttachmentViewModel
+            this.PostAttachments = post.PostAttachements.Select(x => new AttachmentViewModel
             {
-                AttachmentId = x.FileId,
+                attachmentId = x.FileId,
                 fileLink = x.File.FileLink,
                 fileType = x.File.FileType
             }).ToList();

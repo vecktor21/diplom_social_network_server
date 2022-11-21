@@ -27,9 +27,10 @@ namespace server.ViewModels
             this.Message = comment.Message;
             this.Attachment = new AttachmentViewModel
             {
-                AttachmentId = comment.FileId,
+                attachmentId = comment.FileId,
                 fileLink = comment.File.FileLink,
-                fileType = comment.File.FileType
+                fileType = comment.File.FileType,
+                fileName = comment.File.LogicalName
             };
             this.Likes = comment.CommentLikes.Select(x => new LikesViewModel
             {

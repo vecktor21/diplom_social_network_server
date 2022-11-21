@@ -158,7 +158,7 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PostAttachements",
+                name: "PostAttachments",
                 columns: table => new
                 {
                     PostAttachementId = table.Column<int>(type: "int", nullable: false)
@@ -1249,12 +1249,12 @@ namespace server.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostAttachements_FileId",
-                table: "PostAttachements",
+                table: "PostAttachments",
                 column: "FileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostAttachements_PostId",
-                table: "PostAttachements",
+                table: "PostAttachments",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
@@ -1444,7 +1444,7 @@ namespace server.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "PostAttachements");
+                name: "PostAttachments");
 
             migrationBuilder.DropTable(
                 name: "PostComments");

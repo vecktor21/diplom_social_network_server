@@ -744,7 +744,7 @@ namespace server.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostAttachements");
+                    b.ToTable("PostAttachments");
                 });
 
             modelBuilder.Entity("server.Models.PostComment", b =>
@@ -1593,7 +1593,7 @@ namespace server.Migrations
                         .IsRequired();
 
                     b.HasOne("server.Models.Post", "Post")
-                        .WithMany("PostAttachements")
+                        .WithMany("PostAttachments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1882,7 +1882,7 @@ namespace server.Migrations
                 {
                     b.Navigation("Favorites");
 
-                    b.Navigation("PostAttachements");
+                    b.Navigation("PostAttachments");
 
                     b.Navigation("PostComments");
 
