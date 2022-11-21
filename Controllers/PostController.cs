@@ -113,6 +113,65 @@ namespace server.Controllers
             return Json(returnPosts);
         }
 
+        //получить посты друзей пользователя и посты групп, на которые он подписан
+
+        [HttpGet("[action]/{userId}")]
+        public async Task<IActionResult> GetUserLinkedPosts(int userId)
+        {
+            User user = db.Users.FirstOrDefault(x => x.UserId == userId);
+            if(user == null)
+            {
+                return NotFound("пользователь не найден");
+            }
+            List<PostViewModel> posts = new List<PostViewModel>();
+            List<GroupMember> userGroups = db.GroupMembers.Where(x => x.UserId == userId).ToList();
+
+            List<GroupPost> groupPosts = new List<GroupPost>();
+            
+            foreach(var userGroup in userGroups)
+            {
+                groupPosts.AddRange(
+                        db.GroupPosts
+                        .Include(x => x.Group.GroupImage)
+                        .Include(x => x.Post.PostAttachements)
+                        .ThenInclude(x => x.File)
+                        .Include(x => x.Post.PostComments)
+                        .ThenInclude(x => x.Comment.User.Image)
+                        .Include(x => x.Post.PostLikes)
+                        .ThenInclude(x => x.Like.LikedUser)
+                        .Where(x=>x.GroupId==userGroup.GroupId)
+                        .ToList()
+                    );
+            }
+            foreach (var i in groupPosts)
+            {
+                posts.Add(TransformToPostViewModel(i));
+            }
+
+            List<Friend> friends = db.Friends.Where(x => (x.User1Id == userId & x.User2Id != userId) || (x.User1Id != userId & x.User2Id == userId)).ToList();
+
+            List<UserPost> userPosts = new List<UserPost>();
+            foreach (var friend in friends)
+            {
+                userPosts.AddRange(
+                        db.UserPosts
+                        .Include(x => x.User.Image)
+                        .Include(x => x.Post.PostAttachements)
+                        .ThenInclude(x => x.File)
+                        .Include(x => x.Post.PostComments)
+                        .ThenInclude(x => x.Comment.User.Image)
+                        .Include(x => x.Post.PostLikes)
+                        .ThenInclude(x => x.Like.LikedUser)
+                        .Where(x => friend.User1Id == userId ? (x.UserId == friend.User2Id) : (x.UserId == friend.User1Id))
+                        .ToList()
+                    );
+            }
+            foreach (var i in userPosts)
+            {
+                posts.Add(TransformToPostViewModel(i));
+            }
+            return Json(posts.OrderBy(x=>x.PublicationDate));
+        }
 
         //создание поста пользователя
         //при этом все вложения в посте загружаются отдельным запросом на сервер, сюда идут только ID этих вложений
