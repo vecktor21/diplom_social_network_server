@@ -84,7 +84,7 @@ namespace server.Controllers
             {
                 returnPosts.Add(TransformToPostViewModel(i));
             }
-            return Json(returnPosts);
+            return Json(returnPosts.OrderByDescending(x => x.PublicationDate));
         }
 
 
@@ -110,7 +110,7 @@ namespace server.Controllers
             {
                 returnPosts.Add(TransformToPostViewModel(i));
             }
-            return Json(returnPosts);
+            return Json(returnPosts.OrderByDescending(x => x.PublicationDate));
         }
 
         //получить посты друзей пользователя и посты групп, на которые он подписан
@@ -170,7 +170,7 @@ namespace server.Controllers
             {
                 posts.Add(TransformToPostViewModel(i));
             }
-            return Json(posts.OrderBy(x=>x.PublicationDate));
+            return Json(posts.OrderByDescending(x=>x.PublicationDate));
         }
 
         //создание поста пользователя

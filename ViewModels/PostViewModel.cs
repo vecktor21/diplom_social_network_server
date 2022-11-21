@@ -70,7 +70,8 @@ namespace server.ViewModels
             {
                 attachmentId = x.FileId,
                 fileLink = x.File.FileLink,
-                fileType = x.File.FileType
+                fileType = x.File.FileType,
+                fileName = x.File.LogicalName
             }).ToList();
 
             this.Author = new AuthorViewModel
