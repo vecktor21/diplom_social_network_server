@@ -34,7 +34,7 @@ namespace server.Controllers
                 {
                     LogicalName = "default_avatar.png",
                     PhysicalName = "default_avatar.png",
-                    FileType = "IMAGE",
+                    FileType = "image",
                     PublicationDate = DateTime.Now,
                     FileLink = "/files/images/default_avatar.png"
                 };

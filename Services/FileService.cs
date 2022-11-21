@@ -19,7 +19,6 @@ namespace server.Services
         public async Task< Models.File > UploadFile(IFormFile file, IWebHostEnvironment env) 
         {
             string contentType = file.ContentType.Split("/")[0];
-            string htmlElem = "";
             Guid g = Guid.NewGuid();
             string path = "/files";
             string fileName = Path.GetFileName(file.FileName.Replace(" ", "_"));
