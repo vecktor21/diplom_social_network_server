@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using server.Models;
 using server.Services;
 using server.ViewModels;
-using System.Runtime.CompilerServices;
 
 namespace server.Controllers
 {
@@ -67,7 +64,7 @@ namespace server.Controllers
 
 
         //получить все посты пользователя
-        [HttpGet("user/[action]/{userId}")]
+        [HttpGet("group/[action]/{userId}")]
         public IActionResult GetUserPosts(int userId)
         {
             List<UserPost> userPosts = db.UserPosts
@@ -93,7 +90,7 @@ namespace server.Controllers
 
 
         //получить все посты группы
-        [HttpGet("user/[action]/{groupId}")]
+        [HttpGet("group/[action]/{groupId}")]
         public IActionResult GetGroupPosts(int groupId)
         {
             List<GroupPost> groupPosts = db.GroupPosts
@@ -162,6 +159,50 @@ namespace server.Controllers
         }
 
 
+        //создание поста группы
+        //при этом все вложения в посте загружаются отдельным запросом на сервер, сюда идут только ID этих вложений
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateGroupPost(PostCreateViewModel newPost)
+        {
+            try
+            {
+                Group group = db.Groups.FirstOrDefault(x => x.GroupId == newPost.AuthorId);
+                if (group == null)
+                {
+                    return NotFound("не верный ID группы");
+                }
+
+                Post post = new Post
+                {
+                    Text = newPost.Text,
+                    Title = newPost.Title
+                };
+                db.GroupPosts.Add(new GroupPost
+                {
+                    Post = post,
+                    GroupId = group.GroupId
+                });
+                await db.SaveChangesAsync();
+
+                foreach (int i in newPost.Attachments)
+                {
+                    db.PostAttachements.Add(
+                        new PostAttachement
+                        {
+                            Post = post,
+                            File = db.Files.Single(x => x.FileId == i)
+                        }
+                    );
+                }
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception E)
+            {
+                return BadRequest();
+            }
+        }
+
         private PostViewModel TransformToPostViewModel(UserPost userPost)
         {
             PostViewModel postViewModel = new PostViewModel(userPost);
@@ -169,6 +210,7 @@ namespace server.Controllers
             {
                 i.Replies.Add(publicationService.FindCommentReplies(i));
             }
+            postViewModel.PostType = "group";
             return postViewModel;
         }
         private PostViewModel TransformToPostViewModel(GroupPost groupPost)
@@ -178,6 +220,7 @@ namespace server.Controllers
             {
                 i.Replies.Add(publicationService.FindCommentReplies(i));
             }
+            postViewModel.PostType = "group";
             return postViewModel;
         }
     }
