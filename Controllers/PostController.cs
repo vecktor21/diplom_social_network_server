@@ -113,8 +113,9 @@ namespace server.Controllers
             return Json(returnPosts.OrderByDescending(x => x.PublicationDate));
         }
 
-        //получить посты друзей пользователя и посты групп, на которые он подписан
 
+
+        //получить посты друзей пользователя и посты групп, на которые он подписан
         [HttpGet("[action]/{userId}")]
         public async Task<IActionResult> GetUserLinkedPosts(int userId)
         {
@@ -173,10 +174,11 @@ namespace server.Controllers
             return Json(posts.OrderByDescending(x=>x.PublicationDate));
         }
 
+
+
         //создание поста пользователя
         //при этом все вложения в посте загружаются отдельным запросом на сервер, сюда идут только ID этих вложений
         [HttpPost("user/[action]")]
-
         public async Task<IActionResult> CreateUserPost(PostCreateViewModel newPost)
         {
             try
@@ -216,6 +218,7 @@ namespace server.Controllers
                 return BadRequest();
             }
         }
+
 
 
         //создание поста группы
@@ -262,6 +265,8 @@ namespace server.Controllers
             }
         }
 
+
+        //методы для преобразования поста группы\пользователя в модель представления
         private PostViewModel TransformToPostViewModel(UserPost userPost)
         {
             PostViewModel postViewModel = new PostViewModel(userPost);

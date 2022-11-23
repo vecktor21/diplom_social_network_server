@@ -1,0 +1,52 @@
+Comments
+- ObjectId
+
+ArticlePageComment
+public int ArticlePageCommentId {get;set;}
+public int ArticlePageId {get;set;}
+public int CommentId {get;set;}
+
+ArticleComment
+public int ArticleCommentId{get;set;}
+public int ArticleId{get;set;}
+public int CommentId {get;set;}
+
+PostComment
+public int PostCommentId{get;set;}
+public int PostId{get;set;}
+public int CommentId{get;set;}
+
+ReplyComments
+public int ReplyCommentId{get;set;}
+public int MajorCommentId{get;set;}
+public int RepliedCommentId{get;set;}
+
+UserPosts
+public int UserPostsId{get;set;}
+public int PostId{get;set;}
+public int UserId{get;set;}
+
+GroupPosts
+public int GroupPostsId{get;set;}
+public int PostId{get;set;}
+public int GroupId{get;set;}
+
+PostLikes
+public int PostLikeId{get;set;}
+public int PostId{get;set;}
+public int LikeId{get;set;}
+
+CommentLikes
+public int CommentLikeId{get;set;}
+public int CommentId{get;set;}
+public int LikeId{get;set;}
+
+ArticleLikes
+public int ArticleLikeId{get;set;}
+public int ArticleId{get;set;}
+public int LikeId{get;set;}
+
+ArticlePageLikes
+public int ArticlePageLikeId{get;set;}
+public int ArticlePageId{get;set;}
+public int LikeId{get;set;}

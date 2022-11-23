@@ -48,6 +48,9 @@ namespace server.Controllers
             });
             return Json(userFiles);
         }
+
+
+
         //получить все GroupFiles
         [HttpGet("[action]")]
         public IActionResult GroupFiles()
@@ -61,6 +64,9 @@ namespace server.Controllers
             });
             return Json(groupFiles);
         }
+
+
+
 
         //получить все файлы пользователя
         [HttpGet("[action]/{userId}/{fileType?}")]
@@ -83,6 +89,9 @@ namespace server.Controllers
             return Json(userFiles);
         }
 
+
+
+
         //получить все файлы группы
         [HttpGet("[action]/{groupId}/{fileType?}")]
         public IActionResult GroupFiles(int groupId, string? fileType)
@@ -104,6 +113,8 @@ namespace server.Controllers
             }
             return Json(groupFiles);
         }
+
+
 
 
         //загрузка одного файла
@@ -171,6 +182,9 @@ namespace server.Controllers
                 return BadRequest(e);
             }
         }
+
+
+
 
         //загрузка нескольких файлов
         [HttpPut("[action]")]
@@ -248,7 +262,8 @@ namespace server.Controllers
                             x.FileLink,
                             x.FileId,
                             x.LogicalName,
-                            x.PhysicalName
+                            x.PhysicalName,
+                            x.PublicationDate
                         })
                     .ToList());
             }
@@ -257,8 +272,12 @@ namespace server.Controllers
                 return BadRequest(e);
             }
         }
+
+
+
         //удаление файла пользователя
         [HttpDelete("{fileId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteFile(int fileId)
         {
             var file = db.UserFiles.FirstOrDefault(x => x.FileId == fileId);
@@ -278,6 +297,9 @@ namespace server.Controllers
                 return BadRequest(e);
             }
         }
+
+
+
         //удаление файла группы
         [HttpDelete("{fileId}/{groupId}")]
         [Authorize]
