@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Models;
 using server.Services;
 using server.ViewModels;
+using System.Linq;
 
 namespace server.Controllers
 {
@@ -12,25 +14,31 @@ namespace server.Controllers
     {
         private ApplicationContext db;
         private PublicationService publicationService;
-        public PostController(ApplicationContext ct, PublicationService publicationService)
+        private FileService fileService;
+        private IWebHostEnvironment env;
+        public PostController(ApplicationContext ct, PublicationService publicationService, FileService fileService, IWebHostEnvironment env)
         {
             this.db = ct;
             this.publicationService = publicationService;
+            this.fileService = fileService;
+            this.env = env;
         }
+
+
         //получить конкретный пост пользователя
         [HttpGet("user/{postId}")]
         public IActionResult GetUserPost(int postId)
         {
             UserPost post = db.UserPosts
-                .Include(x=>x.User.Image)
-                .Include(x=>x.Post.PostAttachements)
-                .ThenInclude(x=>x.File)
-                .Include(x=>x.Post.PostComments)
-                .ThenInclude(x=>x.Comment.User.Image)
-                .Include(x=>x.Post.PostLikes)
-                .ThenInclude(x=>x.Like.LikedUser)
+                .Include(x => x.User.Image)
+                .Include(x => x.Post.PostAttachements)
+                .ThenInclude(x => x.File)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.User.Image)
+                .Include(x => x.Post.PostLikes)
+                .ThenInclude(x => x.Like.LikedUser)
                 .FirstOrDefault(x => x.PostId == postId);
-            if(post == null)
+            if (post == null)
             {
                 return NotFound();
             }
@@ -80,7 +88,7 @@ namespace server.Controllers
 
             List<PostViewModel> returnPosts = new List<PostViewModel>();
 
-            foreach(var i in userPosts)
+            foreach (var i in userPosts)
             {
                 returnPosts.Add(TransformToPostViewModel(i));
             }
@@ -120,7 +128,7 @@ namespace server.Controllers
         public async Task<IActionResult> GetUserLinkedPosts(int userId)
         {
             User user = db.Users.FirstOrDefault(x => x.UserId == userId);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound("пользователь не найден");
             }
@@ -128,8 +136,8 @@ namespace server.Controllers
             List<GroupMember> userGroups = db.GroupMembers.Where(x => x.UserId == userId).ToList();
 
             List<GroupPost> groupPosts = new List<GroupPost>();
-            
-            foreach(var userGroup in userGroups)
+
+            foreach (var userGroup in userGroups)
             {
                 groupPosts.AddRange(
                         db.GroupPosts
@@ -140,7 +148,7 @@ namespace server.Controllers
                         .ThenInclude(x => x.Comment.User.Image)
                         .Include(x => x.Post.PostLikes)
                         .ThenInclude(x => x.Like.LikedUser)
-                        .Where(x=>x.GroupId==userGroup.GroupId)
+                        .Where(x => x.GroupId == userGroup.GroupId)
                         .ToList()
                     );
             }
@@ -171,7 +179,7 @@ namespace server.Controllers
             {
                 posts.Add(TransformToPostViewModel(i));
             }
-            return Json(posts.OrderByDescending(x=>x.PublicationDate));
+            return Json(posts.OrderByDescending(x => x.PublicationDate));
         }
 
 
@@ -214,7 +222,7 @@ namespace server.Controllers
                 await db.SaveChangesAsync();
                 return Ok();
             }
-            catch(Exception E) {
+            catch (Exception E) {
                 return BadRequest();
             }
         }
@@ -263,6 +271,98 @@ namespace server.Controllers
             {
                 return BadRequest();
             }
+        }
+
+
+
+        //удаление поста пользователя (также удаляет вложения)
+        [HttpDelete("user/[action]")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUserPost(int postId)
+        {
+            //проверка на допуск к удалению поста
+            UserPost userPost = db.UserPosts
+                .Include(x=>x.Post.PostAttachements)
+                .ThenInclude(x=>x.File)
+                .FirstOrDefault(x => x.PostId == postId);
+            if (userPost == null)
+            {
+                return NotFound("пост не найден");
+            }
+            User user = db.Users.FirstOrDefault(x=>x.Login == HttpContext.User.Identity.Name);
+            if(user.UserId != userPost.UserId || user.RoleId != 1)
+            {
+                return Forbid("вы не можете удалить этот пост");
+            }
+
+            try
+            {
+                //удаление файлов 
+                foreach (var file in userPost.Post.PostAttachements)
+                {
+                    db.PostAttachements.Remove(file);
+                    await db.SaveChangesAsync();
+                    fileService.DeleteFile(file.File.FileLink, env);
+                }
+                //удаление поста
+                db.Posts.Remove(userPost.Post);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch(Exception e)
+            {
+                return BadRequest();
+            }
+            
+
+        }
+
+
+
+        //удаление поста группы (также удаляет вложения)
+        [HttpDelete("group/[action]")]
+        [Authorize]
+        public async Task<IActionResult> DeleteGroupPost(int postId)
+        {
+            //проверка на допуск к удалению поста
+            GroupPost groupPost = db.GroupPosts
+                .Include(x => x.Post.PostAttachements)
+                .ThenInclude(x => x.File)
+                .Include(x=>x.Group.GroupMembers)
+                .ThenInclude(x=>x.GroupMemberRole)
+                .FirstOrDefault(x => x.PostId == postId);
+            if (groupPost == null)
+            {
+                return NotFound("пост не найден");
+            }
+            User user = db.Users.FirstOrDefault(x => x.Login == HttpContext.User.Identity.Name);
+            GroupMember groupMember = db.GroupMembers.FirstOrDefault(x => x.UserId == user.UserId && x.GroupId == groupPost.GroupId);
+            List<int> validRoles = new List<int> { 1, 2 };
+            if (!validRoles.Contains(groupMember.GroupMemberRoleId) || user.RoleId != 1)
+            {
+                return Forbid("вы не можете удалить этот пост");
+            }
+
+            try
+            {
+                //удаление файлов 
+                foreach (var file in groupPost.Post.PostAttachements)
+                {
+                    db.PostAttachements.Remove(file);
+                    await db.SaveChangesAsync();
+                    fileService.DeleteFile(file.File.FileLink, env);
+                }
+                //удаление поста
+                db.Posts.Remove(groupPost.Post);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
+
+
         }
 
 
