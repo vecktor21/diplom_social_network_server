@@ -290,15 +290,16 @@ namespace server.Controllers
                 return NotFound("пост не найден");
             }
             User user = db.Users.FirstOrDefault(x=>x.Login == HttpContext.User.Identity.Name);
-            if(user.UserId != userPost.UserId || user.RoleId != 1)
+            if(user.UserId != userPost.UserId && user.RoleId != 1)
             {
                 return Forbid("вы не можете удалить этот пост");
             }
 
             try
             {
-                //удаление файлов 
-                foreach (var file in userPost.Post.PostAttachements)
+                List<PostAttachement> postAttachements = userPost.Post.PostAttachements.ToList();
+                //удаление файлов  
+                foreach (var file in postAttachements)
                 {
                     db.PostAttachements.Remove(file);
                     await db.SaveChangesAsync();
@@ -338,15 +339,20 @@ namespace server.Controllers
             User user = db.Users.FirstOrDefault(x => x.Login == HttpContext.User.Identity.Name);
             GroupMember groupMember = db.GroupMembers.FirstOrDefault(x => x.UserId == user.UserId && x.GroupId == groupPost.GroupId);
             List<int> validRoles = new List<int> { 1, 2 };
-            if (!validRoles.Contains(groupMember.GroupMemberRoleId) || user.RoleId != 1)
+            if(groupMember == null)
+            {
+                return Forbid("вы не можете удалить этот пост");
+            }
+            if (!validRoles.Contains(groupMember.GroupMemberRoleId) && user.RoleId != 1)
             {
                 return Forbid("вы не можете удалить этот пост");
             }
 
             try
             {
+                List<PostAttachement> postAttachements = groupPost.Post.PostAttachements.ToList();
                 //удаление файлов 
-                foreach (var file in groupPost.Post.PostAttachements)
+                foreach (var file in postAttachements)
                 {
                     db.PostAttachements.Remove(file);
                     await db.SaveChangesAsync();

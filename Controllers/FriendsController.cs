@@ -61,11 +61,15 @@ namespace server.Controllers
                 .ToList());
             return Json(friends);
         }
+
+
         [HttpGet("[action]")]
         public IActionResult GetAllFriends()
         {
             return Json(db.Friends.ToList());
         }
+
+
         [HttpGet("[action]")]
         public async Task<IActionResult> FindUsers(string search)
         {
@@ -92,6 +96,8 @@ namespace server.Controllers
                 .ToList();
             return Json(foundUsers);
         }
+
+
         [Authorize]
         [HttpPost("[action]")]
         public async Task<IActionResult> FriendRequest(FriendRequestViewModel request)
@@ -116,11 +122,16 @@ namespace server.Controllers
             return Ok();
             
         }
+
+
         [HttpGet("[action]")]
         public async Task<IActionResult> GetFriendRequests()
         {
             return Json(db.FriendRequests.ToList());
         }
+
+
+
         [Authorize]
         [HttpGet("[action]/{userId}")]
         public async Task<IActionResult> GetFriendRequests(int userId)
@@ -138,6 +149,9 @@ namespace server.Controllers
                 .ToList();
             return Json(res);
         }
+
+
+
         //[Authorize]
         [HttpGet("FriendRequest")]
         public async Task<IActionResult> FriendRequestReact(int requestId, bool isAccepted) 
@@ -166,6 +180,8 @@ namespace server.Controllers
                 return BadRequest();
             }
         }
+
+
         [HttpGet("[action]")]
         public bool HasFriendRequest(int currentUserId, int targetUserId)
         {
@@ -176,6 +192,8 @@ namespace server.Controllers
             }
             return true;
         }
+
+
         [HttpGet("[action]")]
         public bool IsFriend(int currentUserId, int targetUserId)
         {
@@ -186,6 +204,8 @@ namespace server.Controllers
             }
             return true;
         }
+
+
         [HttpDelete("[action]")]
         public async Task<IActionResult> RemoveFromFriends(int currentUserId, int targetUserId)
         {
@@ -198,6 +218,8 @@ namespace server.Controllers
             await db.SaveChangesAsync();
             return Ok();
         }
+
+
         [HttpDelete("[action]")]
         public async Task<IActionResult> RemoveFriendRequest(int currentUserId, int targetUserId)
         {
