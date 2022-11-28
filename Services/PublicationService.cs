@@ -28,6 +28,8 @@ namespace server.Services
                 {
                     CommentViewModel repliedComment = new CommentViewModel(i);
                     repliedComment.IsReply = true;
+                    repliedComment.ObjectId = rootComment.UserId;
+                    repliedComment.ObjectName = rootComment.UserName;
                     repliedComment.Replies = FindCommentReplies(repliedComment);
                     commentReplies.Add(repliedComment);
                 }

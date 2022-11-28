@@ -22,6 +22,7 @@ namespace server.ViewModels
         public string ObjectName { get; set; }
         //является ли коммент ответом на другой коммент
         public bool IsReply { get; set; }
+        public bool IsDeleted { get; set; }
         //список вложений
         public List<AttachmentViewModel> CommentAttachments { get; set; }
         //список лайков
@@ -36,6 +37,7 @@ namespace server.ViewModels
             this.UserName = comment.User.Nickname;
             this.ProfileImage = comment.User.Image.FileLink;
             this.Message = comment.Message;
+            this.IsDeleted = comment.IsDeleted;
             this.CommentAttachments = comment.CommentAttachments.Select(x=> new AttachmentViewModel
             {
                 attachmentId = x.FileID,

@@ -319,7 +319,7 @@ namespace server.Controllers
             {
                 return NotFound("пост не найден");
             }
-            User user = db.Users.FirstOrDefault(x=>x.Login == HttpContext.User.Identity.Name);
+            User user = db.Users.Include(x=>x.Role).FirstOrDefault(x=>x.Login == HttpContext.User.Identity.Name);
             if(user.UserId != userPost.UserId && user.RoleId != 1)
             {
                 return Forbid("вы не можете удалить этот пост");
@@ -366,7 +366,7 @@ namespace server.Controllers
             {
                 return NotFound("пост не найден");
             }
-            User user = db.Users.FirstOrDefault(x => x.Login == HttpContext.User.Identity.Name);
+            User user = db.Users.Include(x => x.Role).FirstOrDefault(x => x.Login == HttpContext.User.Identity.Name);
             GroupMember groupMember = db.GroupMembers.FirstOrDefault(x => x.UserId == user.UserId && x.GroupId == groupPost.GroupId);
             List<int> validRoles = new List<int> { 1, 2 };
             if(groupMember == null)
