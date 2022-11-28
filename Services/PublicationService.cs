@@ -1,4 +1,5 @@
-﻿using server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Models;
 using server.ViewModels;
 
 namespace server.Services
@@ -11,19 +12,28 @@ namespace server.Services
             this.db = db;
         }
 
-        public CommentViewModel FindCommentReplies(CommentViewModel rootComment)
+        public List<CommentViewModel> FindCommentReplies(CommentViewModel rootComment)
         {
             if (db.ReplyComments.Any(x => x.MajorCommentId == rootComment.CommentId))
             {
-                foreach(Comment i in db.ReplyComments.Where(x => x.MajorCommentId == rootComment.CommentId).Select(x=>x.RepliedComment).ToList())
+                List<CommentViewModel> commentReplies = new List<CommentViewModel>();
+                foreach (Comment i in db.ReplyComments
+                    .Include(x=>x.RepliedComment.CommentAttachments)
+                    .ThenInclude(x=>x.File)
+                    .Include(x=>x.RepliedComment.User.Image)
+                    .Include(x => x.RepliedComment.CommentLikes)
+                    .Where(x => x.MajorCommentId == rootComment.CommentId)
+                    .Select(x=>x.RepliedComment)
+                    .ToList())
                 {
                     CommentViewModel repliedComment = new CommentViewModel(i);
                     repliedComment.IsReply = true;
-                    rootComment.Replies.Add(FindCommentReplies(repliedComment));
+                    repliedComment.Replies = FindCommentReplies(repliedComment);
+                    commentReplies.Add(repliedComment);
                 }
-                return rootComment;
+                return commentReplies;
             }
-            return rootComment;
+            return new List<CommentViewModel>();
         }
     }
 }

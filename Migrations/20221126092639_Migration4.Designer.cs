@@ -12,8 +12,8 @@ using server;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20221117123135_Migration1")]
-    partial class Migration1
+    [Migration("20221126092639_Migration4")]
+    partial class Migration4
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -210,7 +210,7 @@ namespace server.Migrations
                     b.Property<DateTime>("DateFrom")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2022, 11, 17, 18, 31, 34, 989, DateTimeKind.Local).AddTicks(3470));
+                        .HasDefaultValue(new DateTime(2022, 11, 26, 15, 26, 37, 534, DateTimeKind.Local).AddTicks(1212));
 
                     b.Property<DateTime>("DateTo")
                         .HasColumnType("datetime2");
@@ -237,7 +237,7 @@ namespace server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentId"), 1L, 1);
 
-                    b.Property<int>("FileId")
+                    b.Property<int?>("FileId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsReply")
@@ -395,7 +395,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_avatar.png",
                             PhysicalName = "default_avatar.png",
-                            PublicationDate = new DateTime(2022, 11, 17, 18, 31, 35, 20, DateTimeKind.Local).AddTicks(6159)
+                            PublicationDate = new DateTime(2022, 11, 26, 15, 26, 37, 545, DateTimeKind.Local).AddTicks(7569)
                         },
                         new
                         {
@@ -404,7 +404,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_group_image.png",
                             PhysicalName = "default_group_image.png",
-                            PublicationDate = new DateTime(2022, 11, 17, 18, 31, 35, 20, DateTimeKind.Local).AddTicks(6181)
+                            PublicationDate = new DateTime(2022, 11, 26, 15, 26, 37, 545, DateTimeKind.Local).AddTicks(7579)
                         });
                 });
 
@@ -728,11 +728,11 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Models.PostAttachment", b =>
                 {
-                    b.Property<int>("PostAttachementId")
+                    b.Property<int>("PostAttachmentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostAttachementId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostAttachmentId"), 1L, 1);
 
                     b.Property<int>("FileId")
                         .HasColumnType("int");
@@ -740,7 +740,7 @@ namespace server.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.HasKey("PostAttachementId");
+                    b.HasKey("PostAttachmentId");
 
                     b.HasIndex("FileId");
 
@@ -960,8 +960,8 @@ namespace server.Migrations
                             Login = "vecktor_21",
                             Name = "Денис",
                             Nickname = "vecktor_21",
-                            Password = "$2a$11$6QrqnqI9dSq2uDDLa74YpOJJO7Jh.d6lfbLwn9a66NqlMOLYZt2LW",
-                            RegistrationDate = new DateTime(2022, 11, 17, 18, 31, 35, 290, DateTimeKind.Local).AddTicks(7574),
+                            Password = "$2a$11$lQoD9O130DtKzTDhcf0JRehM73u/xm40iqpYe1liG6hgJhspHLv.G",
+                            RegistrationDate = new DateTime(2022, 11, 26, 15, 26, 37, 856, DateTimeKind.Local).AddTicks(4827),
                             RoleId = 1,
                             Surname = "Одноуров",
                             TokenId = 1,
@@ -1212,7 +1212,7 @@ namespace server.Migrations
                         new
                         {
                             UserStatusId = 1,
-                            StatusFrom = new DateTime(2022, 11, 17, 18, 31, 35, 20, DateTimeKind.Local).AddTicks(6493),
+                            StatusFrom = new DateTime(2022, 11, 26, 15, 26, 37, 545, DateTimeKind.Local).AddTicks(7626),
                             StatusName = "NORMAL"
                         });
                 });
@@ -1381,9 +1381,7 @@ namespace server.Migrations
                 {
                     b.HasOne("server.Models.File", "File")
                         .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FileId");
 
                     b.HasOne("server.Models.User", "User")
                         .WithMany()
@@ -1595,7 +1593,7 @@ namespace server.Migrations
                         .IsRequired();
 
                     b.HasOne("server.Models.Post", "Post")
-                        .WithMany("PostAttachments")
+                        .WithMany("PostAttachements")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1884,7 +1882,7 @@ namespace server.Migrations
                 {
                     b.Navigation("Favorites");
 
-                    b.Navigation("PostAttachments");
+                    b.Navigation("PostAttachements");
 
                     b.Navigation("PostComments");
 

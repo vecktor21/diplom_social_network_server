@@ -14,6 +14,7 @@ namespace server
         public DbSet<ArticlePageLike> ArticlePageLikes { get; set; }
         public DbSet<BlockList> BlockList { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<CommentAttachment> CommentAttachments { get; set; }
         public DbSet<CommentLike> CommentLikes { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Favorite> Favorites{ get; set; }
@@ -29,7 +30,7 @@ namespace server
         public DbSet<Like> Likes { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Post> Posts { get; set; }
-        public DbSet<PostAttachement> PostAttachements { get; set; }
+        public DbSet<PostAttachment> PostAttachments { get; set; }
         public DbSet<PostComment> PostComments { get; set; }
         public DbSet<PostLike> PostLikes { get; set; }
         public DbSet<ReplyComment> ReplyComments { get; set; }

@@ -6,16 +6,27 @@ namespace server.ViewModels
 {
     public class CommentViewModel
     {
+        //ID комента
         public int CommentId { get; set; }
+        //ID автора (пользователя)
         public int UserId { get; set; }
+        //ник автора (пользователя)
         public string UserName { get; set; }
+        //картинка автора (пользователя)
         public string ProfileImage { get; set; }
+        //текст коммента
         public string Message { get; set; }
+        //ID объекта, к которому пренадлежит (пост, статья или другой коммент)
         public int ObjectId { get; set; }
+        //название объекта, к которому пренадлежит (пост, статья или другой коммент)
         public string ObjectName { get; set; }
+        //является ли коммент ответом на другой коммент
         public bool IsReply { get; set; }
-        public AttachmentViewModel Attachment { get; set; }
+        //список вложений
+        public List<AttachmentViewModel> CommentAttachments { get; set; }
+        //список лайков
         public List<LikesViewModel> Likes { get; set; }
+        //список ответов
         public List<CommentViewModel> Replies { get; set; }
 
         public CommentViewModel(Comment comment)
@@ -25,13 +36,14 @@ namespace server.ViewModels
             this.UserName = comment.User.Nickname;
             this.ProfileImage = comment.User.Image.FileLink;
             this.Message = comment.Message;
-            this.Attachment = new AttachmentViewModel
+            this.CommentAttachments = comment.CommentAttachments.Select(x=> new AttachmentViewModel
             {
-                attachmentId = comment.FileId,
-                fileLink = comment.File.FileLink,
-                fileType = comment.File.FileType,
-                fileName = comment.File.LogicalName
-            };
+                attachmentId = x.FileID,
+                fileLink = x.File.FileLink,
+                fileName = x.File.LogicalName,
+                fileType = x.File.FileType
+                
+            }).ToList();
             this.Likes = comment.CommentLikes.Select(x => new LikesViewModel
             {
                 LikedUserId = x.Like.LikedUserId,

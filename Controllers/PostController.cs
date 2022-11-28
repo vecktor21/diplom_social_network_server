@@ -35,6 +35,11 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.CommentAttachments)
+                .ThenInclude(x => x.File)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.CommentLikes)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .FirstOrDefault(x => x.PostId == postId);
@@ -42,7 +47,7 @@ namespace server.Controllers
             {
                 return NotFound();
             }
-
+            
             return Json(TransformToPostViewModel(post));
         }
 
@@ -58,6 +63,11 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.CommentAttachments)
+                .ThenInclude(x => x.File)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.CommentLikes)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .FirstOrDefault(x => x.PostId == postId);
@@ -81,6 +91,11 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
+                .Include(x=>x.Post.PostComments)
+                .ThenInclude(x=>x.Comment.CommentAttachments)
+                .ThenInclude(x=>x.File)
+                .Include(x=>x.Post.PostComments)
+                .ThenInclude(x=>x.Comment.CommentLikes)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .Where(x => x.UserId == userId)
@@ -107,6 +122,11 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.User.Image)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.CommentAttachments)
+                .ThenInclude(x => x.File)
+                .Include(x => x.Post.PostComments)
+                .ThenInclude(x => x.Comment.CommentLikes)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .Where(x => x.GroupId == groupId)
@@ -146,6 +166,11 @@ namespace server.Controllers
                         .ThenInclude(x => x.File)
                         .Include(x => x.Post.PostComments)
                         .ThenInclude(x => x.Comment.User.Image)
+                        .Include(x => x.Post.PostComments)
+                        .ThenInclude(x => x.Comment.CommentAttachments)
+                        .ThenInclude(x => x.File)
+                        .Include(x => x.Post.PostComments)
+                        .ThenInclude(x => x.Comment.CommentLikes)
                         .Include(x => x.Post.PostLikes)
                         .ThenInclude(x => x.Like.LikedUser)
                         .Where(x => x.GroupId == userGroup.GroupId)
@@ -169,6 +194,11 @@ namespace server.Controllers
                         .ThenInclude(x => x.File)
                         .Include(x => x.Post.PostComments)
                         .ThenInclude(x => x.Comment.User.Image)
+                        .Include(x => x.Post.PostComments)
+                        .ThenInclude(x => x.Comment.CommentAttachments)
+                        .ThenInclude(x => x.File)
+                        .Include(x => x.Post.PostComments)
+                        .ThenInclude(x => x.Comment.CommentLikes)
                         .Include(x => x.Post.PostLikes)
                         .ThenInclude(x => x.Like.LikedUser)
                         .Where(x => friend.User1Id == userId ? (x.UserId == friend.User2Id) : (x.UserId == friend.User1Id))
@@ -211,8 +241,8 @@ namespace server.Controllers
 
                 foreach (int i in newPost.Attachments)
                 {
-                    db.PostAttachements.Add(
-                        new PostAttachement
+                    db.PostAttachments.Add(
+                        new PostAttachment
                         {
                             Post = post,
                             File = db.Files.Single(x => x.FileId == i)
@@ -256,8 +286,8 @@ namespace server.Controllers
 
                 foreach (int i in newPost.Attachments)
                 {
-                    db.PostAttachements.Add(
-                        new PostAttachement
+                    db.PostAttachments.Add(
+                        new PostAttachment
                         {
                             Post = post,
                             File = db.Files.Single(x => x.FileId == i)
@@ -297,11 +327,11 @@ namespace server.Controllers
 
             try
             {
-                List<PostAttachement> postAttachements = userPost.Post.PostAttachements.ToList();
+                List<PostAttachment> postAttachements = userPost.Post.PostAttachements.ToList();
                 //удаление файлов  
                 foreach (var file in postAttachements)
                 {
-                    db.PostAttachements.Remove(file);
+                    db.PostAttachments.Remove(file);
                     await db.SaveChangesAsync();
                     fileService.DeleteFile(file.File.FileLink, env);
                 }
@@ -350,11 +380,11 @@ namespace server.Controllers
 
             try
             {
-                List<PostAttachement> postAttachements = groupPost.Post.PostAttachements.ToList();
+                List<PostAttachment> postAttachements = groupPost.Post.PostAttachements.ToList();
                 //удаление файлов 
                 foreach (var file in postAttachements)
                 {
-                    db.PostAttachements.Remove(file);
+                    db.PostAttachments.Remove(file);
                     await db.SaveChangesAsync();
                     fileService.DeleteFile(file.File.FileLink, env);
                 }
@@ -378,7 +408,7 @@ namespace server.Controllers
             PostViewModel postViewModel = new PostViewModel(userPost);
             foreach (var i in postViewModel.Comments)
             {
-                i.Replies.Add(publicationService.FindCommentReplies(i));
+                i.Replies = publicationService.FindCommentReplies(i);
             }
             postViewModel.PostType = "user";
             return postViewModel;
@@ -388,7 +418,7 @@ namespace server.Controllers
             PostViewModel postViewModel = new PostViewModel(groupPost);
             foreach (var i in postViewModel.Comments)
             {
-                i.Replies.Add(publicationService.FindCommentReplies(i));
+                i.Replies = publicationService.FindCommentReplies(i);
             }
             postViewModel.PostType = "group";
             return postViewModel;
