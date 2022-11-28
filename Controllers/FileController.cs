@@ -273,7 +273,47 @@ namespace server.Controllers
             }
         }
 
+        //загрузка файлов без привязки к пользователю\группе. используется для вложений в комментах
+        [HttpPut("[action]")]
+        public async Task<IActionResult> AddAnonimousFiles(IFormFileCollection files)
+        {
+            if (files == null)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                //загрузка файлов на сервер
+                List<Models.File> newFiles = new List<Models.File>();
 
+                foreach (var file in files)
+                {
+                    newFiles.Add(await fileService.UploadFile(file, _env));
+                }
+
+                //сохранение файлов а базе данных
+                db.Files.AddRange(newFiles);
+
+                await db.SaveChangesAsync();
+
+                return Json(newFiles
+                    .Select(x =>
+                        new
+                        {
+                            x.FileType,
+                            x.FileLink,
+                            x.FileId,
+                            x.LogicalName,
+                            x.PhysicalName,
+                            x.PublicationDate
+                        })
+                    .ToList());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+        }
 
         //удаление файла пользователя
         [HttpDelete("{fileId}")]
