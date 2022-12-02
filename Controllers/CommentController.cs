@@ -82,12 +82,6 @@ namespace server.Controllers
         {
             try
             {
-                //проверки
-                Post post = db.Posts.FirstOrDefault(x => x.PostId == newComment.PostId);
-                if (post == null)
-                {
-                    return NotFound("пост не найден");
-                }
                 User user = db.Users.FirstOrDefault(x => x.UserId == newComment.UserId);
                 if (user == null)
                 {
