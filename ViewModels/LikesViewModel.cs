@@ -1,5 +1,6 @@
 ﻿namespace server.ViewModels
 {
+    //этот класс контроллеры возвращают
     public class LikesViewModel
     {
         public int LikeId { get; set; }

@@ -22,6 +22,7 @@ namespace server.Services
                     .ThenInclude(x=>x.File)
                     .Include(x=>x.RepliedComment.User.Image)
                     .Include(x => x.RepliedComment.CommentLikes)
+                    .ThenInclude(x=>x.Like)
                     .Where(x => x.MajorCommentId == rootComment.CommentId)
                     .Select(x=>x.RepliedComment)
                     .ToList())

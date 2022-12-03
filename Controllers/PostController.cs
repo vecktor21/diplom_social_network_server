@@ -40,6 +40,7 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.CommentLikes)
+                .ThenInclude(x => x.Like)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .FirstOrDefault(x => x.PostId == postId);
@@ -68,6 +69,7 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.CommentLikes)
+                .ThenInclude(x => x.Like)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .FirstOrDefault(x => x.PostId == postId);
@@ -96,6 +98,7 @@ namespace server.Controllers
                 .ThenInclude(x=>x.File)
                 .Include(x=>x.Post.PostComments)
                 .ThenInclude(x=>x.Comment.CommentLikes)
+                .ThenInclude(x => x.Like)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .Where(x => x.UserId == userId)
@@ -127,6 +130,7 @@ namespace server.Controllers
                 .ThenInclude(x => x.File)
                 .Include(x => x.Post.PostComments)
                 .ThenInclude(x => x.Comment.CommentLikes)
+                .ThenInclude(x => x.Like)
                 .Include(x => x.Post.PostLikes)
                 .ThenInclude(x => x.Like.LikedUser)
                 .Where(x => x.GroupId == groupId)
