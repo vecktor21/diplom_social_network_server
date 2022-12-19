@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using server.Models;
 using server.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Principal;
 
@@ -10,6 +13,13 @@ namespace server.Services
 {
     public class AccountService
     {
+        private readonly ApplicationContext db;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AccountService(ApplicationContext db, IHttpContextAccessor httpContextAccessor)
+        {
+            this.db = db;
+            _httpContextAccessor = httpContextAccessor;
+        }
 
         public ClaimsIdentity GetIdentity(TokenAuthModel user)
         {
@@ -46,6 +56,31 @@ namespace server.Services
             JwtSecurityToken access_token = CreateToken(identity, 60*24);
             JwtSecurityToken refresh_token = CreateToken(identity, 3*60 * 24);
             return new List<JwtSecurityToken> { access_token, refresh_token };
+        }
+
+        //проверка авторизации
+        public bool IsCurrentUserAdmin()
+        {
+            string userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+            //проверка авторизации пользователя
+            if (string.IsNullOrEmpty(userName))
+            {
+                return false;
+            }
+            User user = db.Users.Include(x=>x.Role).FirstOrDefault(x => x.Login == userName);
+            
+            //проверка существования пользователя
+            if (user == null)
+            {
+                return false;
+            }
+            //проверка роли
+            if (user.RoleId != 1)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
