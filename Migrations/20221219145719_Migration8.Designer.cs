@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server;
 
@@ -11,9 +12,10 @@ using server;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20221219145719_Migration8")]
+    partial class Migration8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,7 +210,7 @@ namespace server.Migrations
                     b.Property<DateTime>("DateFrom")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2022, 12, 19, 21, 1, 0, 121, DateTimeKind.Local).AddTicks(9998));
+                        .HasDefaultValue(new DateTime(2022, 12, 19, 20, 57, 17, 348, DateTimeKind.Local).AddTicks(5240));
 
                     b.Property<DateTime>("DateTo")
                         .HasColumnType("datetime2");
@@ -360,6 +362,9 @@ namespace server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FavoriteId"), 1L, 1);
 
+                    b.Property<int?>("ArticleId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
@@ -370,6 +375,8 @@ namespace server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("FavoriteId");
+
+                    b.HasIndex("ArticleId");
 
                     b.HasIndex("GroupId");
 
@@ -488,7 +495,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_avatar.png",
                             PhysicalName = "default_avatar.png",
-                            PublicationDate = new DateTime(2022, 12, 19, 21, 1, 0, 149, DateTimeKind.Local).AddTicks(9202)
+                            PublicationDate = new DateTime(2022, 12, 19, 20, 57, 17, 367, DateTimeKind.Local).AddTicks(1382)
                         },
                         new
                         {
@@ -497,7 +504,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_group_image.png",
                             PhysicalName = "default_group_image.png",
-                            PublicationDate = new DateTime(2022, 12, 19, 21, 1, 0, 149, DateTimeKind.Local).AddTicks(9221)
+                            PublicationDate = new DateTime(2022, 12, 19, 20, 57, 17, 367, DateTimeKind.Local).AddTicks(1404)
                         });
                 });
 
@@ -1053,8 +1060,8 @@ namespace server.Migrations
                             Login = "vecktor_21",
                             Name = "Денис",
                             Nickname = "vecktor_21",
-                            Password = "$2a$11$RnBfGjvqKA0toYfoQNGw7OAurJ36uN1o0dw6/GPEt978ppCMbbRU2",
-                            RegistrationDate = new DateTime(2022, 12, 19, 21, 1, 0, 440, DateTimeKind.Local).AddTicks(8683),
+                            Password = "$2a$11$xHPNm2nHCBpv8RvEAkZt7u37ZFiifobA0s7jS9L9TX3kvyGHhflpa",
+                            RegistrationDate = new DateTime(2022, 12, 19, 20, 57, 17, 681, DateTimeKind.Local).AddTicks(9998),
                             RoleId = 1,
                             Surname = "Одноуров",
                             TokenId = 1,
@@ -1305,7 +1312,7 @@ namespace server.Migrations
                         new
                         {
                             UserStatusId = 1,
-                            StatusFrom = new DateTime(2022, 12, 19, 21, 1, 0, 149, DateTimeKind.Local).AddTicks(9298),
+                            StatusFrom = new DateTime(2022, 12, 19, 20, 57, 17, 367, DateTimeKind.Local).AddTicks(1463),
                             StatusName = "NORMAL"
                         });
                 });
@@ -1521,6 +1528,10 @@ namespace server.Migrations
 
             modelBuilder.Entity("server.Models.Favorite", b =>
                 {
+                    b.HasOne("server.Models.Article", null)
+                        .WithMany("Favorites")
+                        .HasForeignKey("ArticleId");
+
                     b.HasOne("server.Models.Group", null)
                         .WithMany("Favorites")
                         .HasForeignKey("GroupId");
@@ -1982,6 +1993,8 @@ namespace server.Migrations
                     b.Navigation("ArticleLikes");
 
                     b.Navigation("ArticlePages");
+
+                    b.Navigation("Favorites");
                 });
 
             modelBuilder.Entity("server.Models.ArticlePage", b =>

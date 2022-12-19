@@ -18,6 +18,9 @@ namespace server
         public DbSet<CommentLike> CommentLikes { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Favorite> Favorites{ get; set; }
+        public DbSet<FavoriteArticle> FavoriteArticles { get; set; }
+        public DbSet<FavoritePost> FavoritePosts { get; set; }
+        public DbSet<FavoriteGroup> FavoriteGroups { get; set; }
         public DbSet<Models.File> Files { get; set; }
         public DbSet<Friend> Friends { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }

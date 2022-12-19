@@ -25,13 +25,8 @@ namespace server.Controllers
         public IActionResult GetKeyWords()
         {
             return Json(db.KeyWords
-                .Select(x =>
-                new KeyWordViewModel
-                {
-                    KeyWordEn = x.KeyWordEn,
-                    KeyWordId = x.KeyWordId,
-                    KeyWordRu = x.KeyWordRu
-                }).ToList());
+                .Select(x =>new KeyWordViewModel(x))
+                .ToList());
         }
 
         //создание ключевого слова

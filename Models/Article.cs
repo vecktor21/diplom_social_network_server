@@ -13,7 +13,6 @@
         public string Introduction { get; set; }
         //оценки
         public int Rating { get; set; }
-        public List<Favorite> Favorites { get; set; }
         //ключевые слова статьи
         public List<ArticleKeyWord> ArticleKeyWords { get; set; }
         //ссылки на страницы статьи
