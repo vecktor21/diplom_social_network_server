@@ -27,7 +27,7 @@ namespace server.ViewModels
             this.Author = new UserViewModel(article.Author);
             this.Title = article.Title;
             this.Introduction= article.Introduction; 
-            this.Rating= article.Rating;
+            this.Rating= article.ArticleLikes.Count();
             this.ArticleKeyWords = article.ArticleKeyWords.Select(x=>new KeyWordViewModel(x.KeyWord)).ToList();
         }
     }

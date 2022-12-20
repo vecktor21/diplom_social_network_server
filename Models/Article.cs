@@ -11,8 +11,6 @@
         public string Title { get; set; }
         //введение в статью
         public string Introduction { get; set; }
-        //оценки
-        public int Rating { get; set; }
         //ключевые слова статьи
         public List<ArticleKeyWord> ArticleKeyWords { get; set; }
         //ссылки на страницы статьи
