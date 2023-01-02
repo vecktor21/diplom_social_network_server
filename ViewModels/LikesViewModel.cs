@@ -1,4 +1,6 @@
-﻿namespace server.ViewModels
+﻿using server.Models;
+
+namespace server.ViewModels
 {
     //этот класс контроллеры возвращают
     public class LikesViewModel

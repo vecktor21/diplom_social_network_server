@@ -32,6 +32,7 @@ namespace server.ViewModels
 
         public CommentViewModel(Comment comment)
         {
+            this.IsReply = false;
             this.CommentId = comment.CommentId;
             this.UserId = comment.UserId;
             this.UserName = comment.User.Nickname;

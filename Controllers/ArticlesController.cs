@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
 using server.Models;
+using server.Services;
 using server.ViewModels;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -16,9 +17,13 @@ namespace server.Controllers
     public class ArticlesController : Controller
     {
         private ApplicationContext db;
-        public ArticlesController(ApplicationContext db) 
+        private PublicationService _publicationService;
+        private AccountService _accountService;
+        public ArticlesController(ApplicationContext db, PublicationService publicationService, AccountService accountService) 
         {
             this.db = db;
+            _publicationService = publicationService;
+            _accountService = accountService;
         }
 
 
@@ -73,16 +78,7 @@ namespace server.Controllers
         {
             try
             {
-                List<ArticleViewModel> articles = db.Articles
-                    .Include(x => x.Author.Role)
-                    .Include(x=>x.Author.Image)
-                    .Include(x => x.ArticleLikes)
-                    .ThenInclude(x => x.Like.LikedUser)
-                    .Include(x => x.ArticleKeyWords)
-                    .ThenInclude(x => x.KeyWord)
-                    .Include(x => x.ArticleComments)
-                    .ThenInclude(x => x.Comment.User)
-                    .Include(x => x.ArticlePages)
+                List<ArticleViewModel> articles = IncludeArticleData()
                     .Select(x => new ArticleViewModel(x))
                     .ToList();
                 return Json(articles);
@@ -90,17 +86,48 @@ namespace server.Controllers
             catch (Exception e)
             {
 
-                return BadRequest(e);
+                return BadRequest();
+            }
+        }
+
+        //получение одной статьи
+        [HttpGet("{articleId}")]
+        public IActionResult GetArticle(int articleId)
+        {
+            try
+            {
+                Article article = IncludeArticleData()
+                    .FirstOrDefault(x => x.ArticleId == articleId);
+                if(article == null)
+                {
+                    return NotFound("статья не найдена");
+                }
+                ArticleViewModel articleViewModel = new ArticleViewModel(article);
+                foreach (var comment in articleViewModel.Comments)
+                {
+                    comment.Replies = _publicationService.FindCommentReplies(comment);
+                }
+                return Json(articleViewModel);
+            }
+            catch (Exception e)
+            {
+
+                return BadRequest();
             }
         }
 
         //удаление статьи
         [HttpDelete("[action]/{articleId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteArticle(int articleId)
         {
             try
             {
                 Article article = db.Articles.FirstOrDefault(x => x.ArticleId == articleId);
+                if (!(_accountService.IsCurrentUserAdmin() && _publicationService.IsCurrentUserArticleAuthor(article)))
+                {
+                    return Forbid();
+                }
                 if(article == null)
                 {
                     return NotFound("статья не найдена");
@@ -117,13 +144,17 @@ namespace server.Controllers
 
         //изменение информации о статье
         [HttpPost("[action]")]
+        [Authorize]
         public async Task<IActionResult> UpdateArticle(ArticleUpdateViewModel updatedArticle)
         {
             Article article = db.Articles
                 .Include(x=>x.ArticleKeyWords)
                 .ThenInclude(x=> x.KeyWord)
                 .FirstOrDefault(x => x.ArticleId == updatedArticle.ArticleId);
-
+            if (!(_accountService.IsCurrentUserAdmin() && _publicationService.IsCurrentUserArticleAuthor(article)))
+            {
+                return Forbid();
+            }
             if (article == null) return NotFound("Сатья не найдена");
 
             //изменение данных статьи
@@ -159,6 +190,28 @@ namespace server.Controllers
             return db.KeyWords
                 .Where(x => keyWordIds.Any(y => y == x.KeyWordId))
                 .ToList();
+        }
+        
+        //подгрузить данные статей
+        private List<Article> IncludeArticleData()
+        {
+            return db.Articles
+                    .Include(x => x.Author.Role)
+                    .Include(x => x.Author.Image)
+                    .Include(x => x.ArticleLikes)
+                    .ThenInclude(x => x.Like.LikedUser)
+                    .Include(x => x.ArticleKeyWords)
+                    .ThenInclude(x => x.KeyWord)
+                    .Include(x => x.ArticleComments)
+                    .ThenInclude(x => x.Comment.User)
+                    .Include(x => x.ArticleComments)
+                    .ThenInclude(x => x.Comment.CommentLikes)
+                    .ThenInclude(x => x.Like)
+                    .Include(x => x.ArticleComments)
+                    .ThenInclude(x => x.Comment.CommentAttachments)
+                    .ThenInclude(x => x.File)
+                    .Include(x => x.ArticlePages)
+                    .ToList();
         }
     }
 }

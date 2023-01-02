@@ -7,11 +7,13 @@ namespace server.Services
     public class PublicationService
     {
         private ApplicationContext db;
-        public PublicationService(ApplicationContext db)
+        private IHttpContextAccessor _httpContextAccessor;
+        public PublicationService(ApplicationContext db, IHttpContextAccessor httpContextAccessor)
         {
             this.db = db;
+            _httpContextAccessor = httpContextAccessor;
         }
-
+        //рекурсивно получает все ответы на исходный коммент
         public List<CommentViewModel> FindCommentReplies(CommentViewModel rootComment)
         {
             if (db.ReplyComments.Any(x => x.MajorCommentId == rootComment.CommentId))
@@ -37,6 +39,17 @@ namespace server.Services
                 return commentReplies;
             }
             return new List<CommentViewModel>();
+        }
+        //проверяет, является ли текущий пользователь - автором статьи
+        public bool IsCurrentUserArticleAuthor(Article article)
+        {
+            User user = db.Users.FirstOrDefault(x => x.Login == _httpContextAccessor.HttpContext.User.Identity.Name);
+
+            if (article.AuthorId == user.UserId)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

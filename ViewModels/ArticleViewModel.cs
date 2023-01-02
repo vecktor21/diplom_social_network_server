@@ -17,8 +17,12 @@ namespace server.ViewModels
         public int Rating { get; set; }
         //ключевые слова статьи
         public List<KeyWordViewModel> ArticleKeyWords { get; set; }
-        //TODO
-        //добавить остальные поля (комментарии и т.п.)
+        //лайки
+        public List<LikesViewModel> Likes { get; set; }
+        //комментарии
+        public List<CommentViewModel> Comments { get; set; }
+        //страницы статьи
+        public List<int> ArticlePages { get; set; }
 
         //конструктор
         public ArticleViewModel(Article article)
@@ -29,6 +33,25 @@ namespace server.ViewModels
             this.Introduction= article.Introduction; 
             this.Rating= article.ArticleLikes.Count();
             this.ArticleKeyWords = article.ArticleKeyWords.Select(x=>new KeyWordViewModel(x.KeyWord)).ToList();
+
+            //лайки
+            this.Likes = article
+                .ArticleLikes
+                .Select(x => new LikesViewModel
+                {
+                    LikedUserId=x.Like.LikedUserId,
+                    LikeId = x.Like.LikeId,
+                    ObjectId = x.ArticleId
+                })
+                .ToList();
+
+            //комментарии
+            this.Comments = article.ArticleComments
+                .Select(x => new CommentViewModel(x.Comment))
+                .ToList();
+
+            //ссылки на страницы
+            this.ArticlePages = article.ArticlePages.Select(x=>x.ArticlePageId).ToList();
         }
     }
 }
