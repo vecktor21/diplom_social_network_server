@@ -26,7 +26,7 @@ namespace server.Controllers
 
         //создать комментарии поста
         [HttpPost("[action]")]
-        public async Task<IActionResult> CreatePostComment(CommentCreateViewModel newComment)
+        public async Task<IActionResult> CreatePostComment(PostCommentCreateViewModel newComment)
         {
             try
             {
@@ -44,16 +44,7 @@ namespace server.Controllers
 
 
                 //создание коммента
-                Comment comment = new Comment
-                {
-                    Message = newComment.Message,
-                    UserId = newComment.UserId,
-                    IsReply = false
-                };
-
-                //сохранение коммента в бд
-                db.Comments.Add(comment);
-                await db.SaveChangesAsync();
+                Comment comment = await CreateComment(newComment.Message, newComment.UserId);
 
                 //связь коммента с постом (создание PostComment)
                 db.PostComments.Add(new PostComment
@@ -74,6 +65,86 @@ namespace server.Controllers
         }
 
 
+        //создание коммента к статье
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateArticleComment(ArticleCommentCreateViewModel newComment)
+        {
+            try
+            {
+                //проверки
+                Article article = db.Articles.FirstOrDefault(x => x.ArticleId == newComment.ArticleId);
+                if (article == null)
+                {
+                    return NotFound("статья не найдена");
+                }
+                User user = db.Users.FirstOrDefault(x => x.UserId == newComment.UserId);
+                if (user == null)
+                {
+                    return NotFound("пользователь не найден");
+                }
+
+
+                //создание коммента
+                Comment comment = await CreateComment(newComment.Message, newComment.UserId);
+
+                //связь коммента с постом (создание PostComment)
+                db.ArticleComments.Add(new ArticleComment
+                {
+                    Article = article,
+                    Comment = comment
+                });
+
+                await AddAttachmentsToComment(newComment.AttachmentsId, comment);
+
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
+        //создание коммента к странице статьи
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateArticlePageComment(ArticlePageCommentCreateViewModel newComment)
+        {
+            try
+            {
+                //проверки
+                ArticlePage articlePage = db.ArticlePages.FirstOrDefault(x => x.ArticlePageId == newComment.ArticlePageId);
+                if (articlePage == null)
+                {
+                    return NotFound("статья не найдена");
+                }
+                User user = db.Users.FirstOrDefault(x => x.UserId == newComment.UserId);
+                if (user == null)
+                {
+                    return NotFound("пользователь не найден");
+                }
+
+
+                //создание коммента
+                Comment comment = await CreateComment(newComment.Message, newComment.UserId);
+
+                //связь коммента с постом (создание PostComment)
+                db.ArticlePageComments.Add(new ArticlePageComment
+                {
+                    ArticlePage = articlePage,
+                    Comment = comment
+                });
+
+                await AddAttachmentsToComment(newComment.AttachmentsId, comment);
+
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
 
         //ответить на коммент
@@ -203,6 +274,24 @@ namespace server.Controllers
                     })
                 );
             await db.SaveChangesAsync();
+        }
+
+
+        //создание коммента общего вида
+        private async Task<Comment> CreateComment(string message, int userId)
+        {
+            //создание коммента
+            Comment comment = new Comment
+            {
+                Message = message,
+                UserId = userId,
+                IsReply = false
+            };
+
+            //сохранение коммента в бд
+            db.Comments.Add(comment);
+            await db.SaveChangesAsync();
+            return comment;
         }
     }
 }
