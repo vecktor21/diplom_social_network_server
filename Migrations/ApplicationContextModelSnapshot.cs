@@ -98,7 +98,7 @@ namespace server.Migrations
                     b.ToTable("ArticleKeyWords");
                 });
 
-            modelBuilder.Entity("server.Models.ArticleLike", b =>
+            modelBuilder.Entity("server.Models.ArticlePageLike", b =>
                 {
                     b.Property<int>("ArticleLikeId")
                         .ValueGeneratedOnAdd()
@@ -1375,7 +1375,7 @@ namespace server.Migrations
                     b.Navigation("KeyWord");
                 });
 
-            modelBuilder.Entity("server.Models.ArticleLike", b =>
+            modelBuilder.Entity("server.Models.ArticlePageLike", b =>
                 {
                     b.HasOne("server.Models.Article", "Article")
                         .WithMany("ArticleLikes")

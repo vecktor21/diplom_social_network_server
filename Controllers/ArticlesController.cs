@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using NuGet.Packaging.Signing;
 using server.Models;
 using server.Services;
 using server.ViewModels;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
@@ -24,6 +26,51 @@ namespace server.Controllers
             this.db = db;
             _publicationService = publicationService;
             _accountService = accountService;
+        }
+
+        //поиск статей
+        [HttpGet("[action]")]
+        public List <ArticleViewModel> SearchArticles(string query)
+        {
+            List<ArticleViewModel> searchResult = db.Articles
+                .Include(x => x.Author.Role)
+                .Include(x => x.Author.Image)
+                .Include(x => x.ArticleLikes)
+                .ThenInclude(x => x.Like.LikedUser)
+                .Include(x => x.ArticleKeyWords)
+                .ThenInclude(x => x.KeyWord)
+                .Include(x => x.ArticleComments)
+                .ThenInclude(x => x.Comment.User)
+                .Include(x => x.ArticleComments)
+                .ThenInclude(x => x.Comment.CommentLikes)
+                .ThenInclude(x => x.Like)
+                .Include(x => x.ArticleComments)
+                .ThenInclude(x => x.Comment.CommentAttachments)
+                .ThenInclude(x => x.File)
+                .Include(x => x.ArticlePages)
+                .Where(x =>
+                    EF.Functions.Like(x.Title, $"%{query}%") ||
+                    EF.Functions.Like(x.Introduction, $"%{query}%")
+                )
+                .Select(x => new ArticleViewModel(x))
+                .ToList();
+
+            List<KeyWord> keyWords = _publicationService.FindKeyWords(query);
+
+            foreach (var keyWord in keyWords)
+            {
+                foreach (var articleKeyWord in keyWord.ArticleKeyWords)
+                {
+                    searchResult.AddRange(
+                        IncludeArticleData()
+                        .Where(x=>x.ArticleId==articleKeyWord.ArticleId)
+                        .Select(x => new ArticleViewModel(x)));
+                }
+            }
+
+
+            return searchResult.DistinctBy(x => x.ArticleId).ToList();
+                
         }
 
 

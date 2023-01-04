@@ -110,5 +110,99 @@ namespace server.Controllers
             await db.SaveChangesAsync();
             return Ok();
         }
+
+
+
+        //добавить лайк\убрать лайк к статье
+        [HttpPost("article")]
+        public async Task<IActionResult> LikeArticle(ArticleLikeViewModel like)
+        {
+            //проверка на существование пользователя и статьи
+            Article article = db.Articles.FirstOrDefault(x => x.ArticleId == like.ArticleId);
+            User user = db.Users.FirstOrDefault(x => x.UserId == like.UserId);
+            if (article == null)
+            {
+                return NotFound("статья не найдена");
+            }
+            if (user == null)
+            {
+                return NotFound("пользователь не найден");
+            }
+            //если статья не лайкнута - лайкаем
+            if (!like.IsLiked)
+            {
+                //дополнительная проверка на то, лайкнута статья или нет:   
+                if (db.ArticleLikes.Include(x => x.Like).Any(x => (x.Like.LikedUserId == like.UserId) && (x.ArticleId == like.ArticleId)))
+                {
+                    return BadRequest("эта статья уже была лайкнута");
+                }
+                db.ArticleLikes.Add(new ArticleLike
+                {
+                    Article = article,
+                    Like = new Like
+                    {
+                        LikedUser = user
+                    }
+                });
+            }
+            //если лайкнут - убираем лайк
+            else
+            {
+                ArticleLike articleLike = db.ArticleLikes.Include(x => x.Like).FirstOrDefault(x => x.ArticleId == like.ArticleId && x.Like.LikedUserId == like.UserId);
+                if (articleLike == null)
+                {
+                    return NotFound("лайк не найден");
+                }
+                db.ArticleLikes.Remove(articleLike);
+            }
+            await db.SaveChangesAsync();
+            return Ok();
+        }
+
+        //добавить лайк\убрать лайк к странице статьи
+        [HttpPost("articlePage")]
+        public async Task<IActionResult> LikeArticlePage(ArticlePageLikeViewModel like)
+        {
+            //проверка на существование пользователя и статьи
+            ArticlePage articlePage = db.ArticlePages.FirstOrDefault(x => x.ArticlePageId == like.ArticlePageId);
+            User user = db.Users.FirstOrDefault(x => x.UserId == like.UserId);
+            if (articlePage == null)
+            {
+                return NotFound("страница не найдена");
+            }
+            if (user == null)
+            {
+                return NotFound("пользователь не найден");
+            }
+            //если страница не лайкнута - лайкаем
+            if (!like.IsLiked)
+            {
+                //дополнительная проверка на то, лайкнута статья или нет:   
+                if (db.ArticlePageLikes.Include(x => x.Like).Any(x => (x.Like.LikedUserId == like.UserId) && (x.ArticlePageId == like.ArticlePageId)))
+                {
+                    return BadRequest("эта страница уже была лайкнута");
+                }
+                db.ArticlePageLikes.Add(new ArticlePageLike
+                {
+                    ArticlePage = articlePage,
+                    Like = new Like
+                    {
+                        LikedUser = user
+                    }
+                });
+            }
+            //если лайкнут - убираем лайк
+            else
+            {
+                ArticlePageLike articlePageLike = db.ArticlePageLikes.Include(x => x.Like).FirstOrDefault(x => x.ArticlePageId == like.ArticlePageId && x.Like.LikedUserId == like.UserId);
+                if (articlePageLike == null)
+                {
+                    return NotFound("лайк не найден");
+                }
+                db.ArticlePageLikes.Remove(articlePageLike);
+            }
+            await db.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

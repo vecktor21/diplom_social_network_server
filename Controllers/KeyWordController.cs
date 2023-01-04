@@ -13,11 +13,13 @@ namespace server.Controllers
     public class KeyWordController : Controller
     {
         private ApplicationContext db;
-        private AccountService accountService;
-        public KeyWordController(ApplicationContext db, AccountService accountService)
+        private AccountService _accountService;
+        private PublicationService _publicationService;
+        public KeyWordController(ApplicationContext db, AccountService accountService, PublicationService publicationService)
         {
             this.db = db;
-            this.accountService = accountService;
+            this._accountService = accountService;
+            this._publicationService = publicationService;
         }
 
         //получение всех ключевых слов
@@ -33,8 +35,8 @@ namespace server.Controllers
         [HttpPost]
         public async Task<IActionResult> AddKeyWord(KeyWordCreateViewModel newKeyWord)
         {
-            List<KeyWord> foundKeyWordsRu = FindKeyWords(newKeyWord.KeyWordRu);
-            List<KeyWord> foundKeyWordsEn = FindKeyWords(newKeyWord.KeyWordEn);
+            List<KeyWord> foundKeyWordsRu = _publicationService.FindKeyWords(newKeyWord.KeyWordRu);
+            List<KeyWord> foundKeyWordsEn = _publicationService.FindKeyWords(newKeyWord.KeyWordEn);
             if(foundKeyWordsEn.Count + foundKeyWordsRu.Count > 0)
             {
                 return BadRequest("такое ключевое слово уже существует");
@@ -48,7 +50,7 @@ namespace server.Controllers
         [HttpGet("[action]")]
         public IActionResult Fing(string query)
         {
-            List<KeyWord> keyWords = FindKeyWords(query);
+            List<KeyWord> keyWords = _publicationService.FindKeyWords(query);
             return Json(keyWords);
         }
 
@@ -59,7 +61,7 @@ namespace server.Controllers
         public async Task<IActionResult> DeleteKeyword(int keywordId)
         {
             //проверка прав доступа
-            if (!accountService.IsCurrentUserAdmin())
+            if (!_accountService.IsCurrentUserAdmin())
             {
                 return Unauthorized();
             }
@@ -74,19 +76,7 @@ namespace server.Controllers
         }
 
 
-        //метод для поиска ключевых слов
-        private List<KeyWord> FindKeyWords(string query)
-        {
-            List<KeyWord> keyWords = db.KeyWords
-                .Where(x=>
-                    EF.Functions.Like(x.KeyWordRu, $"%{query}%") ||
-                    EF.Functions.Like(x.KeyWordEn, $"%{query}%")||
-                    EF.Functions.Like(x.KeyWordRu+x.KeyWordEn, $"%{query}%") ||
-                    EF.Functions.Like(x.KeyWordEn + x.KeyWordRu, $"%{query}%")
-                )
-                .ToList();
-            return keyWords;
-        }
+        
 
         
     }

@@ -51,5 +51,20 @@ namespace server.Services
             }
             return false;
         }
+
+        //метод для поиска ключевых слов
+        public List<KeyWord> FindKeyWords(string query)
+        {
+            List<KeyWord> keyWords = db.KeyWords
+                .Include(x=>x.ArticleKeyWords)
+                .Where(x =>
+                    EF.Functions.Like(x.KeyWordRu, $"%{query}%") ||
+                    EF.Functions.Like(x.KeyWordEn, $"%{query}%") ||
+                    EF.Functions.Like(x.KeyWordRu + x.KeyWordEn, $"%{query}%") ||
+                    EF.Functions.Like(x.KeyWordEn + x.KeyWordRu, $"%{query}%")
+                )
+                .ToList();
+            return keyWords;
+        }
     }
 }
