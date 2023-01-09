@@ -48,9 +48,11 @@ namespace server.Controllers
 
         //поиск ключевых слов
         [HttpGet("[action]")]
-        public IActionResult Fing(string query)
+        public IActionResult Find(string query)
         {
-            List<KeyWord> keyWords = _publicationService.FindKeyWords(query);
+            List<KeyWordViewModel> keyWords = _publicationService.FindKeyWords(query)
+                .Select(x => new KeyWordViewModel(x))
+                .ToList();
             return Json(keyWords);
         }
 
@@ -76,7 +78,17 @@ namespace server.Controllers
         }
 
 
-        
+        //получить ключевые слова (интересы) пользователя
+        [HttpGet("[action]")]
+        public IActionResult GetUserInterests(int userId)
+        {
+            List<KeyWordViewModel> userKeyWords = db.UserInterests
+                .Include(x => x.KeyWord)
+                .Where(x => x.UserId == userId)
+                .Select(x => new KeyWordViewModel(x.KeyWord))
+                .ToList();
+            return Json(userKeyWords);
+        }
 
         
     }

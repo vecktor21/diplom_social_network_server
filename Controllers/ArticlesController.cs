@@ -73,6 +73,16 @@ namespace server.Controllers
                 
         }
 
+        //получение всех статей автора
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetArticlesByAuthor(int authorId)
+        {
+            List<ArticleViewModel> articles = IncludeArticleData()
+                .Where(x=>x.AuthorId==authorId)
+                .Select(x => new ArticleViewModel(x))
+                .ToList();
+            return Json(articles);
+        }
 
         //создание основы статьи
         [HttpPost("[action]")]
