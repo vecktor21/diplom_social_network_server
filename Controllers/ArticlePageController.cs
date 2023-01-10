@@ -27,7 +27,7 @@ namespace server.Controllers
         {
             //добавить include для нужных полей
             ArticlePage articlePage = db.ArticlePages
-                .Include(x=>x.Article)
+                .Include(x=>x.Article.ArticlePages)
                 .Include(x=>x.ArticlePageLikes)
                 .ThenInclude(x=>x.Like.LikedUser)
                 .Include(x=>x.ArticlePageComments)
@@ -51,6 +51,27 @@ namespace server.Controllers
 
             return Json(articlePageViewModel);
         }
+
+        //получение страницы для изменения 
+        [HttpGet("[action]/{pageId}")]
+        public IActionResult GetArticlePageForUpdate(int pageId)
+        {
+            //добавить include для нужных полей
+            ArticlePage articlePage = db.ArticlePages
+                .FirstOrDefault(x => x.ArticlePageId == pageId);
+            if (articlePage == null)
+            {
+                return NotFound("страница не найдена");
+            }
+            ArticlePageUpdateViewModel articlePageUpdateViewModel = new ArticlePageUpdateViewModel
+            {
+                ArticlePageId = articlePage.ArticleId,
+                Text = articlePage.Text
+            };
+
+            return Json(articlePageUpdateViewModel);
+        }
+
         //создать страницу
         [HttpPost("[action]")]
         public async Task<IActionResult> CreateArticlePage(ArticlePageCreateViewModel newArticlePage)

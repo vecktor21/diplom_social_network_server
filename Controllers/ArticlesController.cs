@@ -173,6 +173,38 @@ namespace server.Controllers
             }
         }
 
+
+
+        //получение одной статьи
+        [HttpGet("[action]/{articleId}")]
+        public IActionResult GetArticleForUpdate(int articleId)
+        {
+            try
+            {
+                Article article = IncludeArticleData()
+                    .FirstOrDefault(x => x.ArticleId == articleId);
+                if (article == null)
+                {
+                    return NotFound("статья не найдена");
+                }
+                ArticleUpdateViewModel articleUpdateViewModel = new ArticleUpdateViewModel
+                {
+                    ArticleId = article.ArticleId,
+                    Title = article.Title,
+                    Introduction = article.Introduction,
+                    KeyWords = article.ArticleKeyWords.Select(x=>x.KeyWordId).ToList()
+                };
+                
+                return Json(articleUpdateViewModel);
+            }
+            catch (Exception e)
+            {
+
+                return BadRequest();
+            }
+        }
+
+
         //удаление статьи
         [HttpDelete("[action]/{articleId}")]
         [Authorize]

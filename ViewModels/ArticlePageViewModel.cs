@@ -11,12 +11,15 @@ namespace server.ViewModels
         public string Text { get; set; }
         //название статьи, к которой принадлежит страница
         public string ArticleTitle { get; set; }
+        public int AuthorId { get; set; }
         //ID статьи
         public int ArticleId { get; set; }
         //лайки
         public List<LikesViewModel> Likes { get; set; }
         //комментарии
         public List<CommentViewModel> Comments { get; set; }
+        //все страницы статьи
+        public List<int> articlePages { get; set; }
 
         public ArticlePageViewModel(ArticlePage articlePage)
         {
@@ -24,7 +27,8 @@ namespace server.ViewModels
             this.Text = articlePage.Text;
             this.ArticleTitle = articlePage.Article.Title;
             this.ArticleId = articlePage.ArticleId;
-
+            this.AuthorId = articlePage.Article.AuthorId;
+            this.articlePages = articlePage.Article.ArticlePages.Select(x => x.ArticlePageId).ToList();
             //лайки
             this.Likes = articlePage
                 .ArticlePageLikes
