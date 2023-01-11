@@ -58,6 +58,8 @@ namespace server
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Article>().HasIndex(e => e.Title).IsUnique().HasDatabaseName("Articles_Title_Index");
+            builder.Entity<Article>().Property(x=>x.PublicationDate).HasDefaultValueSql("getdate()");
+            builder.Entity<ArticlePage>().Property(x => x.PublicationDate).HasDefaultValueSql("getdate()");
             builder.Entity<BlockList>().Property(x => x.DateFrom).HasDefaultValue(DateTime.Now);
             builder.Entity<Comment>().Property(x => x.IsReply).HasDefaultValue(false);
             //builder.Entity<Models.File>().HasIndex(e => e.).IsUnique();

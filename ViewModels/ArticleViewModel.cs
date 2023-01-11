@@ -13,6 +13,8 @@ namespace server.ViewModels
         public string Title { get; set; }
         //введение в статью
         public string Introduction { get; set; }
+        //датьа публикации
+        public DateTime PublicationDate { get; set; }
         //оценки
         public int Rating { get; set; }
         //ключевые слова статьи
@@ -33,6 +35,7 @@ namespace server.ViewModels
             this.Introduction= article.Introduction; 
             this.Rating= article.ArticleLikes.Count();
             this.ArticleKeyWords = article.ArticleKeyWords.Select(x=>new KeyWordViewModel(x.KeyWord)).ToList();
+            this.PublicationDate = article.PublicationDate;
 
             //лайки
             this.Likes = article

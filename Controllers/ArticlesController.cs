@@ -28,6 +28,32 @@ namespace server.Controllers
             _accountService = accountService;
         }
 
+        //получение рекомендаций пользователя
+        [HttpGet("[action]")]
+        public IActionResult GetRecomendedArticles(int userId)
+        {
+
+            User user = db.Users.FirstOrDefault(x => x.UserId == userId);
+            if (user == null)
+            {
+                return NotFound("пользователь не найден");
+            }
+            List<KeyWord> userInterests = db.UserInterests
+                .Include(x=>x.KeyWord)
+                .Where(x => x.UserId == userId)
+                .Select(x=>x.KeyWord)
+                .ToList();
+
+            List<ArticleViewModel> articles = IncludeArticleData()
+                .Where(x => x.ArticleKeyWords.Any(y=>userInterests.Contains(y.KeyWord)))
+                .Select(x => new ArticleViewModel(x))
+                .OrderByDescending(x=>x.PublicationDate)
+                .Take(10)
+                .ToList();
+
+            return Json(articles);
+        }
+
         //поиск статей
         [HttpGet("[action]")]
         public List <ArticleViewModel> SearchArticles(string query)

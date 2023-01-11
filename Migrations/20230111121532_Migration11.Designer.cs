@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server;
 
@@ -11,9 +12,10 @@ using server;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230111121532_Migration11")]
+    partial class Migration11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,9 +40,7 @@ namespace server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("PublicationDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -138,9 +138,7 @@ namespace server.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PublicationDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -210,7 +208,7 @@ namespace server.Migrations
                     b.Property<DateTime>("DateFrom")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2023, 1, 11, 18, 21, 12, 842, DateTimeKind.Local).AddTicks(6278));
+                        .HasDefaultValue(new DateTime(2023, 1, 11, 18, 15, 30, 954, DateTimeKind.Local).AddTicks(9344));
 
                     b.Property<DateTime>("DateTo")
                         .HasColumnType("datetime2");
@@ -490,7 +488,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_avatar.png",
                             PhysicalName = "default_avatar.png",
-                            PublicationDate = new DateTime(2023, 1, 11, 18, 21, 12, 857, DateTimeKind.Local).AddTicks(9220)
+                            PublicationDate = new DateTime(2023, 1, 11, 18, 15, 30, 969, DateTimeKind.Local).AddTicks(1707)
                         },
                         new
                         {
@@ -499,7 +497,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_group_image.png",
                             PhysicalName = "default_group_image.png",
-                            PublicationDate = new DateTime(2023, 1, 11, 18, 21, 12, 857, DateTimeKind.Local).AddTicks(9229)
+                            PublicationDate = new DateTime(2023, 1, 11, 18, 15, 30, 969, DateTimeKind.Local).AddTicks(1717)
                         });
                 });
 
@@ -1055,8 +1053,8 @@ namespace server.Migrations
                             Login = "vecktor_21",
                             Name = "Денис",
                             Nickname = "vecktor_21",
-                            Password = "$2a$11$Iy1uxzRBvirCodbxc4zju.9s8tcUmz34MQ5mjP4CbxTLxhZhgN16m",
-                            RegistrationDate = new DateTime(2023, 1, 11, 18, 21, 13, 65, DateTimeKind.Local).AddTicks(3667),
+                            Password = "$2a$11$8YdqiHuegWOKmTX3KrqkpuZABAK95WvtCfDgZv1XR6.j4oPu35fRW",
+                            RegistrationDate = new DateTime(2023, 1, 11, 18, 15, 31, 127, DateTimeKind.Local).AddTicks(4023),
                             RoleId = 1,
                             Surname = "Одноуров",
                             TokenId = 1,
@@ -1307,7 +1305,7 @@ namespace server.Migrations
                         new
                         {
                             UserStatusId = 1,
-                            StatusFrom = new DateTime(2023, 1, 11, 18, 21, 12, 857, DateTimeKind.Local).AddTicks(9264),
+                            StatusFrom = new DateTime(2023, 1, 11, 18, 15, 30, 969, DateTimeKind.Local).AddTicks(1759),
                             StatusName = "NORMAL"
                         });
                 });

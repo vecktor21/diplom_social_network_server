@@ -14,6 +14,8 @@ namespace server.ViewModels
         public int AuthorId { get; set; }
         //ID статьи
         public int ArticleId { get; set; }
+        //дата публикации
+        public DateTime PublicationDate { get; set; }
         //лайки
         public List<LikesViewModel> Likes { get; set; }
         //комментарии
@@ -29,6 +31,7 @@ namespace server.ViewModels
             this.ArticleId = articlePage.ArticleId;
             this.AuthorId = articlePage.Article.AuthorId;
             this.articlePages = articlePage.Article.ArticlePages.Select(x => x.ArticlePageId).ToList();
+            this.PublicationDate = articlePage.PublicationDate;
             //лайки
             this.Likes = articlePage
                 .ArticlePageLikes

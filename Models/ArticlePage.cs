@@ -9,6 +9,8 @@
         public Article Article { get; set; }
         //текст на странице
         public string Text { get; set; }
+        //датьа публикации
+        public DateTime PublicationDate { get; set; }
         //ссылка на комментарии
         public List<ArticlePageComment> ArticlePageComments { get; set; }
         //ссылка на лайки

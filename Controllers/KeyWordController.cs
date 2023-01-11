@@ -90,6 +90,63 @@ namespace server.Controllers
             return Json(userKeyWords);
         }
 
-        
+        //добавить ключевое слово в интересы пользователя
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddUserInterest(int userId, int keyWordId)
+        {
+            User user = db.Users.FirstOrDefault(x => x.UserId == userId);
+            if (user == null)
+            {
+                return NotFound("пользователь не найден");
+            }
+            KeyWord keyWord= db.KeyWords.FirstOrDefault(x => x.KeyWordId == keyWordId);
+            if (keyWord == null)
+            {
+                return NotFound("ключевое слово не найдено");
+            }
+            UserInterest userInterest = db.UserInterests.FirstOrDefault(x => x.UserId == userId && x.KeyWordId == keyWordId);
+            if(userInterest != null) {
+                return BadRequest("это ключевое слово уже добавлено");
+            }
+            try
+            {
+                db.UserInterests.Add(new UserInterest
+                {
+                    User = user,
+                    KeyWord = keyWord
+                });
+                await db.SaveChangesAsync();
+                return Ok();
+            }catch(Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+
+        //удалить ключевое слово из интересов пользователя
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveUserInterest(int userId, int keyWordId)
+        {
+            User user = db.Users.FirstOrDefault(x => x.UserId == userId);
+            if (user == null)
+            {
+                return NotFound("пользователь не найден");
+            }
+            UserInterest userInterest = db.UserInterests.FirstOrDefault(x => x.UserId == userId && x.KeyWordId == keyWordId);
+            if (userInterest == null)
+            {
+                return BadRequest("ключевое слово не найдено");
+            }
+            try
+            {
+                db.UserInterests.Remove(userInterest);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
     }
 }
