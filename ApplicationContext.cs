@@ -13,6 +13,8 @@ namespace server
         public DbSet<ArticlePageComment> ArticlePageComments { get; set; }
         public DbSet<ArticlePageLike> ArticlePageLikes { get; set; }
         public DbSet<BlockList> BlockList { get; set; }
+        public DbSet<ChatRoom> ChatRooms { get; set; }
+        public DbSet<ChatRoomType> ChatRoomTypes { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<CommentAttachment> CommentAttachments { get; set; }
         public DbSet<CommentLike> CommentLikes { get; set; }
@@ -31,6 +33,8 @@ namespace server
         public DbSet<GroupPost> GroupPosts { get; set; }
         public DbSet<KeyWord> KeyWords { get; set; }
         public DbSet<Like> Likes { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<MessageAttachment> MessageAttachments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostAttachment> PostAttachments { get; set; }
@@ -40,6 +44,8 @@ namespace server
         public DbSet<RequestToGroup> RequestToGroup { get; set; }
         public DbSet<Subscribe> Subscribes { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserChatRoom> UserChatRooms { get; set; }
+        public DbSet<UserChatRoomRole> UserChatRoomRoles { get; set; }
         public DbSet<UserFile> UserFiles { get; set; }
         public DbSet<UserInfo> UserInfo { get; set; }
         public DbSet<UserInfoPrivacyType> UserInfoPrivacyTypes { get; set; }
@@ -92,14 +98,16 @@ namespace server
             builder.Entity<UserRole>().Property(x => x.RoleName).HasDefaultValue("USER");
             builder.Entity<UserStatus>().Property(x => x.StatusFrom).HasDefaultValueSql("getdate()");
             builder.Entity<UserStatus>().Property(x => x.StatusName).HasDefaultValue("NORMAL");
-            //создание стандартных значений
 
+            //создание стандартных значений
+            //создание стран
             Country country = new Country { CountryID = 1, CountryNameRu = "Казахстан", CountryNameEn = "Kazakhstan" };
             builder.Entity<Country>().HasData(
                 country,
                 new Country { CountryID = 2, CountryNameRu = "Россия", CountryNameEn = "Russia" },
                 new Country { CountryID = 3, CountryNameRu = "Узбекистан", CountryNameEn = "Uzbekistan" }
             );
+            //создание ключевых слов
             builder.Entity<KeyWord>().HasData(
                 new KeyWord { KeyWordId = 1 ,KeyWordRu = "информационные системы", KeyWordEn = "information systems" },
                 new KeyWord { KeyWordId = 2, KeyWordRu = "веб-технологии", KeyWordEn = "web technologies" },
@@ -213,6 +221,32 @@ namespace server
             };
 
             builder.Entity<GroupMemberRole>().HasData(moderatorRole, adminRole, userRole);
+
+            //создание начальных значений ролей в чатах
+            UserChatRoomRole adminChatRoomRole = new UserChatRoomRole
+            {
+                Role = "admin",
+                UserChatRoomRoleId = 1
+            };
+            UserChatRoomRole userChatRoomRole = new UserChatRoomRole
+            {
+                Role = "user",
+                UserChatRoomRoleId = 2
+            };
+            builder.Entity<UserChatRoomRole>().HasData(adminChatRoomRole, userChatRoomRole);
+
+            //задание начальных значений типов чатов
+            ChatRoomType privateChatRoom = new ChatRoomType
+            {
+                ChatRoomTypeId = 1,
+                ChatRoomTypeName = "private"
+            };
+            ChatRoomType publicChatRoom = new ChatRoomType
+            {
+                ChatRoomTypeId = 2,
+                ChatRoomTypeName = "public"
+            };
+            builder.Entity<ChatRoomType>().HasData(privateChatRoom, publicChatRoom);
         }
     }
 }

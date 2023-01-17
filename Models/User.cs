@@ -40,8 +40,9 @@ namespace server.Models
         public List<Subscribe> SubSub { get; set; }
         public List<UserInterest> UserInterests { get; set; }
         public List<UserNote> UserNotes { get; set; }
+        public List<UserChatRoom> UserChatRooms { get; set; }
 
-        
+
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server;
 
@@ -11,9 +12,10 @@ using server;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230117094503_Migration13")]
+    partial class Migration13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,7 +212,7 @@ namespace server.Migrations
                     b.Property<DateTime>("DateFrom")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2023, 1, 17, 16, 14, 51, 135, DateTimeKind.Local).AddTicks(2769));
+                        .HasDefaultValue(new DateTime(2023, 1, 17, 15, 45, 1, 180, DateTimeKind.Local).AddTicks(454));
 
                     b.Property<DateTime>("DateTo")
                         .HasColumnType("datetime2");
@@ -257,7 +259,7 @@ namespace server.Migrations
 
                     b.HasIndex("ChatRoomTypeId");
 
-                    b.ToTable("ChatRooms");
+                    b.ToTable("ChatRoom");
                 });
 
             modelBuilder.Entity("server.Models.ChatRoomType", b =>
@@ -274,7 +276,7 @@ namespace server.Migrations
 
                     b.HasKey("ChatRoomTypeId");
 
-                    b.ToTable("ChatRoomTypes");
+                    b.ToTable("ChatRoomType");
 
                     b.HasData(
                         new
@@ -550,7 +552,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_avatar.png",
                             PhysicalName = "default_avatar.png",
-                            PublicationDate = new DateTime(2023, 1, 17, 16, 14, 51, 154, DateTimeKind.Local).AddTicks(1082)
+                            PublicationDate = new DateTime(2023, 1, 17, 15, 45, 1, 198, DateTimeKind.Local).AddTicks(4031)
                         },
                         new
                         {
@@ -559,7 +561,7 @@ namespace server.Migrations
                             FileType = "IMAGE",
                             LogicalName = "default_group_image.png",
                             PhysicalName = "default_group_image.png",
-                            PublicationDate = new DateTime(2023, 1, 17, 16, 14, 51, 154, DateTimeKind.Local).AddTicks(1096)
+                            PublicationDate = new DateTime(2023, 1, 17, 15, 45, 1, 198, DateTimeKind.Local).AddTicks(4043)
                         });
                 });
 
@@ -853,7 +855,7 @@ namespace server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("server.Models.Notification", b =>
@@ -1145,8 +1147,8 @@ namespace server.Migrations
                             Login = "vecktor_21",
                             Name = "Денис",
                             Nickname = "vecktor_21",
-                            Password = "$2a$11$wcbQsoEWq3BZLb9w4LF/TeB/xjQfFlGi6oMyIosD1y1MQOsk0Y062",
-                            RegistrationDate = new DateTime(2023, 1, 17, 16, 14, 51, 416, DateTimeKind.Local).AddTicks(2879),
+                            Password = "$2a$11$uNwaD1Kbqy5KLWzk9HCrAupdwO9cafUBdWdVXEs14aNbzaFeQWIu2",
+                            RegistrationDate = new DateTime(2023, 1, 17, 15, 45, 1, 952, DateTimeKind.Local).AddTicks(5471),
                             RoleId = 1,
                             Surname = "Одноуров",
                             TokenId = 1,
@@ -1180,7 +1182,7 @@ namespace server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserChatRooms");
+                    b.ToTable("UserChatRoom");
                 });
 
             modelBuilder.Entity("server.Models.UserChatRoomRole", b =>
@@ -1197,7 +1199,7 @@ namespace server.Migrations
 
                     b.HasKey("UserChatRoomRoleId");
 
-                    b.ToTable("UserChatRoomRoles");
+                    b.ToTable("UserChatRoomRole");
 
                     b.HasData(
                         new
@@ -1454,7 +1456,7 @@ namespace server.Migrations
                         new
                         {
                             UserStatusId = 1,
-                            StatusFrom = new DateTime(2023, 1, 17, 16, 14, 51, 154, DateTimeKind.Local).AddTicks(1187),
+                            StatusFrom = new DateTime(2023, 1, 17, 15, 45, 1, 198, DateTimeKind.Local).AddTicks(4144),
                             StatusName = "NORMAL"
                         });
                 });
