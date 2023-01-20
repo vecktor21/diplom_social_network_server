@@ -1,0 +1,4 @@
+﻿{"protocol":"json","version":1}
+
+для постмана: отправлять после каждого сообщения
+eyJwcm90b2NvbCI6Impzb24iLCAidmVyc2lvbiI6MX0e

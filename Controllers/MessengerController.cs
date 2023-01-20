@@ -21,6 +21,30 @@ namespace server.Controllers
         
         }
 
+        //работа с сообщениями
+        //удаление сообщения
+        [HttpDelete("[action]/{messageId}")]
+        public async Task<IActionResult> RemoveMessage(int messageId)
+        {
+            try
+            {
+                Message message = db.Messages.FirstOrDefault(x => x.MessageId == messageId);
+                if (message == null)
+                {
+                    return NotFound("сообщение не найдено");
+                }
+                db.Messages.Remove(message);
+                await db.SaveChangesAsync();
+                return Ok();
+            }catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+        //работа с чат комнатами
+
         //создать чат
         [HttpPost("[action]")]
         public async Task<ActionResult> CreateChatRoom(ChatRoomCreateViewModel chatRoomCreateViewModel)

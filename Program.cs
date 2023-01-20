@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using server;
+using server.Hubs;
 using server.Services;
 using server.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AccountService>();
 builder.Services.AddCors(opts =>
@@ -37,6 +39,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<GroupService>();
 builder.Services.AddTransient<PublicationService>();
+builder.Services.AddTransient<MessageService>();
 
 //сервис записи файлов в файловую систему
 builder.Services.AddTransient<FileService>();
@@ -58,6 +61,12 @@ app.UseCors("default");
 app.UseAuthentication();
 app.UseAuthorization();
 
+//необходимо перенести MapControllers в UseEndpoints
+/*app.UseRouting();
+app.UseEndpoints(endpoing =>
+{
+    endpoing.MapHub<MessengerHub>("/chat");
+});*/
 app.MapControllers();
 
 app.Run();

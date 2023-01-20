@@ -82,6 +82,7 @@ namespace server
             builder.Entity<Group>().HasIndex(x => x.GroupName).IsUnique().HasDatabaseName("Groups_GroupName_Index");
             builder.Entity<KeyWord>().HasIndex(x => x.KeyWordRu).IsUnique().HasDatabaseName("KeyWords_KeyWordRu_Index");
             builder.Entity<KeyWord>().HasIndex(x => x.KeyWordEn).IsUnique().HasDatabaseName("KeyWords_KeyWordEn_Index");
+            builder.Entity<Message>().Property(x => x.SendingTime).HasDefaultValueSql("getdate()");
             builder.Entity<Notification>().Property(x => x.IsViewed).HasDefaultValue(false);
             builder.Entity<Post>().Property(x => x.PublicationDate).HasDefaultValueSql("getdate()");
             builder.Entity<Post>().Property(x => x.Title).HasDefaultValue("");

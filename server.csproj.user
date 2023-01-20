@@ -11,5 +11,9 @@
     <WebStackScaffolding_DbContextTypeFullName>server.ApplicationContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <NameOfLastUsedPublishProfile>C:\Users\HP\Desktop\Дипломная\сервер\server\Properties\PublishProfiles\Default Settings.pubxml</NameOfLastUsedPublishProfile>
+    <ActiveDebugProfile>server</ActiveDebugProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
