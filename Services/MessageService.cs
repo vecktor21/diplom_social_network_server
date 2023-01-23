@@ -25,14 +25,14 @@ namespace server.Services
                 await db.Messages.AddAsync(message);
 
                 List<MessageAttachment> messageAttachments = db.Files
-                    .Where(x => newMesage.MessageAttachemntIds.Contains(x.FileId))
+                    .Where(x => newMesage.MessageAttachmentIds.Contains(x.FileId))
                     .Select(x=>new MessageAttachment
                     {
                         Message = message,
                         File = x
                     })
                     .ToList();
-
+                await db.SaveChangesAsync();
                 return message;
             }
             catch(Exception ex)

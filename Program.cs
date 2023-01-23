@@ -62,11 +62,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 //необходимо перенести MapControllers в UseEndpoints
-/*app.UseRouting();
+app.UseRouting();
 app.UseEndpoints(endpoing =>
 {
     endpoing.MapHub<MessengerHub>("/chat");
-});*/
-app.MapControllers();
+    endpoing.MapControllers();
+});
+//app.MapControllers();
 
 app.Run();

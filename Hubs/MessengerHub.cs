@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using server.Models;
 using server.Services;
 using server.ViewModels;
 namespace server.Hubs
@@ -19,9 +20,12 @@ namespace server.Hubs
             string groupName = message.ChatRoomId.ToString();
             if (groupName != null)
             {
-                await _messageService.AddMessage(message);
-                await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-                await Clients.Groups(groupName).SendAsync("Receive", "test");
+                Message newMessage = await _messageService.AddMessage(message);
+                if(newMessage != null)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+                    await Clients.Groups(groupName).SendAsync("Receive", new MessageViewModel(newMessage));
+                }
             }
             
         }

@@ -9,6 +9,7 @@ namespace server.ViewModels
         public string ChatRoomType { get; set; }
         public string ChatRoomImage { get; set; }
         public string ChatRoomName { get; set; }
+        public MessageViewModel LastMessage{ get; set; }
         public List<MessageViewModel> Messages { get; set; }
         public List<UserViewModel> Members { get; set; }
         public int ChatRoomAdminId { get; set; }
@@ -19,6 +20,7 @@ namespace server.ViewModels
             this.ChatRoomImage = chatRoom.ChatRoomImage.FileLink;
             this.ChatRoomName = chatRoom.ChatRoomName;
             this.Messages = chatRoom.Messages.Select(x=>new MessageViewModel(x)).ToList();
+            this.LastMessage = this.Messages.Count >0 ? this.Messages.OrderByDescending(x => x.SendingTime).First() : null;
             this.Members = chatRoom.UserChatRooms.Select(x => new UserViewModel(x.User)).ToList();
             foreach (var UserChatRoom in chatRoom.UserChatRooms)
             {
