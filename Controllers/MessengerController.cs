@@ -80,13 +80,14 @@ namespace server.Controllers
                 
                 if (chatRoomType.ChatRoomTypeId == 2)
                 {
-                    if (chatRoomCreateViewModel.AdminId == null || chatRoomMembers.Any(x => x.UserId == chatRoomCreateViewModel.AdminId))
+                    if (chatRoomCreateViewModel.AdminId == null || !chatRoomMembers.Any(x => x.UserId == chatRoomCreateViewModel.AdminId))
                     {
                         db.ChatRooms.Remove(chatRoom);
                         await db.SaveChangesAsync();
                         return BadRequest("ошибка, указан не верный ID админа");
                     }
                     chatRoomMembers.First(x => x.UserId == chatRoomCreateViewModel.AdminId).UserChatRoomRoleId = 1;
+
                 }
                 db.UserChatRooms.AddRange(chatRoomMembers);
                 await db.SaveChangesAsync();
@@ -95,7 +96,7 @@ namespace server.Controllers
             {
                 return BadRequest();
             }
-            return Ok();
+            return new JsonResult(chatRoom.ChatRoomId);
         }
 
         //удаление чата
@@ -175,7 +176,8 @@ namespace server.Controllers
                 {
                     User = x,
                     ChatRoom = chatRoom,
-                    UserChatRoomRoleId = 2
+                    UserChatRoomRoleId = 2,
+                    UserId = x.UserId
                 })
                 .ToList();
             return chatRoomMembers;

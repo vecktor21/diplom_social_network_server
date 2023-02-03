@@ -58,11 +58,11 @@ app.UseHttpsRedirection();
 
 app.UseCors("default");
 
-app.UseAuthentication();
-app.UseAuthorization();
 
 //необходимо перенести MapControllers в UseEndpoints
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseEndpoints(endpoing =>
 {
     endpoing.MapHub<MessengerHub>("/chat");

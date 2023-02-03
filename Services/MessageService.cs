@@ -1,4 +1,5 @@
-﻿using server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using server.Models;
 using server.ViewModels;
 
 namespace server.Services
@@ -16,17 +17,27 @@ namespace server.Services
         {
             try
             {
+                User sernder = db.Users
+                    .Include(x=>x.Role)
+                    .Include(x=>x.Image)
+                    .FirstOrDefault(x => x.UserId == newMesage.SenderId);
+                if(sernder == null)
+                {
+                    return null;
+                }
                 Message message = new Message
                 {
                     ChatRoomId = newMesage.ChatRoomId,
                     SenderId = newMesage.SenderId,
-                    Text = newMesage.Text
+                    Sender = sernder,
+                    Text = newMesage.Text,
+                    MessageAttachments = new List<MessageAttachment>()
                 };
                 await db.Messages.AddAsync(message);
 
-                List<MessageAttachment> messageAttachments = db.Files
+                message.MessageAttachments = db.Files
                     .Where(x => newMesage.MessageAttachmentIds.Contains(x.FileId))
-                    .Select(x=>new MessageAttachment
+                    .Select(x => new MessageAttachment
                     {
                         Message = message,
                         File = x

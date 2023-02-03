@@ -20,14 +20,22 @@ namespace server.Hubs
             string groupName = message.ChatRoomId.ToString();
             if (groupName != null)
             {
-                Message newMessage = await _messageService.AddMessage(message);
-                if(newMessage != null)
+                await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+                try
                 {
-                    await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-                    await Clients.Groups(groupName).SendAsync("Receive", new MessageViewModel(newMessage));
+                    Message newMessage = await _messageService.AddMessage(message);
+                    if (newMessage != null)
+                    {
+                        MessageViewModel messageViewModel = new MessageViewModel(newMessage);
+                        await Clients.Groups(groupName).SendAsync("Receive", messageViewModel);
+                        //await Clients.All.SendAsync("Test", messageViewModel);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Clients.Groups(groupName).SendAsync("Error", ex.Message);
                 }
             }
-            
         }
 
         public override async Task OnConnectedAsync()
