@@ -68,6 +68,6 @@ app.UseEndpoints(endpoing =>
     endpoing.MapHub<MessengerHub>("/chat");
     endpoing.MapControllers();
 });
+//запуск приложения
 //app.MapControllers();
-
 app.Run();
