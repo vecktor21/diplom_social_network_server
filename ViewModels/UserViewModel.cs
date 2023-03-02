@@ -11,6 +11,7 @@ namespace server.ViewModels
         public string Login { get; set; }
         public string Role { get; set; }
         public string ProfileImage { get; set; }
+        public string Email { get; set; }
         public UserViewModel(User user)
         {
             this.UserId = user.UserId;
@@ -20,6 +21,7 @@ namespace server.ViewModels
             this.Login = user.Login;
             this.Role = user.Role.RoleName;
             this.ProfileImage = user.Image.FileLink;
+            this.Email=user.Email;
         }
     }
 }

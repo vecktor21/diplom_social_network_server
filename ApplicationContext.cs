@@ -12,7 +12,6 @@ namespace server
         public DbSet<ArticlePage> ArticlePages { get; set; }
         public DbSet<ArticlePageComment> ArticlePageComments { get; set; }
         public DbSet<ArticlePageLike> ArticlePageLikes { get; set; }
-        public DbSet<BlockList> BlockList { get; set; }
         public DbSet<ChatRoom> ChatRooms { get; set; }
         public DbSet<ChatRoomType> ChatRoomTypes { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -27,6 +26,7 @@ namespace server
         public DbSet<Friend> Friends { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupBlockList> GroupBlockList { get; set; }
         public DbSet<GroupFile> GroupFiles { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<GroupMemberRole> GroupMemberRoles { get; set; }
@@ -44,6 +44,7 @@ namespace server
         public DbSet<RequestToGroup> RequestToGroup { get; set; }
         public DbSet<Subscribe> Subscribes { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserBlockList> UserBlockList { get; set; }
         public DbSet<UserChatRoom> UserChatRooms { get; set; }
         public DbSet<UserChatRoomRole> UserChatRoomRoles { get; set; }
         public DbSet<UserFile> UserFiles { get; set; }
@@ -66,7 +67,6 @@ namespace server
             builder.Entity<Article>().HasIndex(e => e.Title).IsUnique().HasDatabaseName("Articles_Title_Index");
             builder.Entity<Article>().Property(x=>x.PublicationDate).HasDefaultValueSql("getdate()");
             builder.Entity<ArticlePage>().Property(x => x.PublicationDate).HasDefaultValueSql("getdate()");
-            builder.Entity<BlockList>().Property(x => x.DateFrom).HasDefaultValue(DateTime.Now);
             builder.Entity<Comment>().Property(x => x.IsReply).HasDefaultValue(false);
             //builder.Entity<Models.File>().HasIndex(e => e.).IsUnique();
             builder.Entity<Country>().HasIndex(x => x.CountryNameRu).IsUnique().HasDatabaseName("Countries_CountryNameRu_Index");
@@ -80,6 +80,8 @@ namespace server
             builder.Entity<FriendRequest>().HasOne(x => x.User).WithMany(x => x.FriendRequestsReceivers).HasForeignKey(x => x.UserId);
             builder.Entity<FriendRequest>().Property(x => x.Message).HasDefaultValue("Добрый день, я бы хотел добавить вас в друзья :)");
             builder.Entity<Group>().HasIndex(x => x.GroupName).IsUnique().HasDatabaseName("Groups_GroupName_Index");
+            builder.Entity<GroupBlockList>().Property(x => x.DateFrom).HasDefaultValue(DateTime.Now);
+            builder.Entity<GroupBlockList>().Property(x => x.Reason).HasDefaultValue("");
             builder.Entity<KeyWord>().HasIndex(x => x.KeyWordRu).IsUnique().HasDatabaseName("KeyWords_KeyWordRu_Index");
             builder.Entity<KeyWord>().HasIndex(x => x.KeyWordEn).IsUnique().HasDatabaseName("KeyWords_KeyWordEn_Index");
             builder.Entity<Message>().Property(x => x.SendingTime).HasDefaultValueSql("getdate()");
@@ -94,6 +96,11 @@ namespace server
             //builder.Entity<User>().HasOne(x => x.Image).WithOne(x => x.UsersImage).HasForeignKey<User>(x => x.ImageId);
             builder.Entity<User>().Property(x => x.RegistrationDate).HasDefaultValueSql("getdate()");
             builder.Entity<User>().Property(x => x.IsVerified).HasDefaultValue(false);
+            //builder.Entity<User>().HasMany(x => x.BlockedUsers).WithOne(x => x.BlockedUser).HasForeignKey("");
+            builder.Entity<UserBlockList>().Property(x => x.DateFrom).HasDefaultValue(DateTime.Now);
+            builder.Entity<UserBlockList>().Property(x => x.Reason).HasDefaultValue("");
+            builder.Entity<User>().HasMany(x => x.BlockedUsers).WithOne(x => x.BlockedUser).HasForeignKey(x=>x.BlockedUserId);
+            //builder.Entity<User>().HasMany(x => x.BlockedUsers).WithOne(x => x.User);
             builder.Entity<UserInfo>().Property(x => x.Status).HasDefaultValue("");
             builder.Entity<UserNote>().Property(x => x.Title).HasDefaultValue("");
             builder.Entity<UserRole>().Property(x => x.RoleName).HasDefaultValue("USER");

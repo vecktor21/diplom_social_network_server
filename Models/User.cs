@@ -26,7 +26,7 @@ namespace server.Models
         public UserStatus UserStatus { get; set; }
         //foreign keys
         public List<Article> Articles { get; set; }
-        public List<BlockList> BlockedUsers{ get; set; }
+        public List<UserBlockList> BlockedUsers{ get; set; }
         public List<Favorite> Favorites { get; set; }
         public List<UserFile> UserFile { get; set; }
         public virtual List<Friend> Friends1 { get; set; }

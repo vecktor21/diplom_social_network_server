@@ -82,5 +82,54 @@ namespace server.Services
 
             return true;
         }
+        //проверка доступа к странице пользователя
+        public bool IsAllowed(int targetUserId, int? currentUserId, out string message)
+        {
+            User? targetUser = db.Users
+                .Include(x=>x.UserInfo.UserInfoPrivacyType)
+                .Include(x=>x.BlockedUsers)
+                .FirstOrDefault(x => x.UserId == targetUserId);
+            //проверка на то, существует ли искомый пользователь
+            if (targetUser == null)
+            {
+                message = "пользователь не найден";
+                return false;
+            }
+            //проверка, если приватная страница - то нельзя 
+            if (targetUser.UserInfo.UserInfoPrivacyTypeId == 2)
+            {
+                message = "вы не можете просматривать приватную страницу";
+                return false;
+            }
+            //проверка, есть ли текущий пользователь
+            User? currentUser = db.Users.FirstOrDefault(x => x.UserId == currentUserId);
+            if (currentUser == null)
+            {
+                message = "пользователь не найден";
+                return false;
+            }
+            //проверка, заблокированы или нет
+            UserBlockList? userBlock = db.UserBlockList.FirstOrDefault(x=>x.UserId==targetUserId && x.BlockedUserId==currentUserId);
+            if (userBlock!=null)
+            {
+                message = "вы в черном списке у данного пользователя";
+                return false;
+            }
+            //если страница для друзей, то проверить - друзья вы или нет
+            if(targetUser.UserInfo.UserInfoPrivacyTypeId == 3)
+            {
+                Friend? friend = db.Friends.FirstOrDefault(x => (x.User1Id == currentUserId && x.User2Id == targetUserId) || (x.User2Id == currentUserId && x.User1Id == targetUserId));
+                if (friend == null)
+                {
+                    message = "данную страницу могут просматривать только друзья";
+                    return false;
+                }
+                message = "доступ есть";
+                return true;
+            }
+            //если страница публичная - можно посмотреть
+            message = "доступ есть";
+            return true;
+        }
     }
 }
