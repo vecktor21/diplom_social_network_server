@@ -11,6 +11,7 @@ using server;
 using server.Models;
 using server.Services;
 using server.ViewModels;
+using server.ViewModels.Additional;
 
 namespace server.Controllers
 {
@@ -20,11 +21,13 @@ namespace server.Controllers
     {
         private readonly ApplicationContext db;
         private readonly AccountService accountService;
+        private readonly GroupService groupService;
 
-        public UserController(ApplicationContext context, AccountService accountService)
+        public UserController(ApplicationContext context, AccountService accountService, GroupService groupService)
         {
             db = context;
             this.accountService = accountService;
+            this.groupService = groupService;
         }
         [HttpGet("users")]
         //[Authorize(Roles = "ADMIN")]
@@ -86,6 +89,12 @@ namespace server.Controllers
                 return BadRequest(e.Message);
             }
         }
+        /// <summary>
+        /// изменение аватарки
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newImageId"></param>
+        /// <returns></returns>
 
         [HttpPost("[action]")]
         public async Task<IActionResult> ChangeUserProfileImage(int userId, int newImageId)
@@ -188,6 +197,45 @@ namespace server.Controllers
             {
                 return BadRequest();
             }
+        }
+
+
+        /// <summary>
+        /// поиск людей
+        /// </summary>
+        /// <param name="page">номер страницы
+        /// рассчет по формуле Count/Take (округлить вверх)
+        /// </param>
+        /// <param name="page">номер страницы
+        /// рассчет по формуле Count/Take (округлить вверх)
+        /// </param>
+        /// <returns></returns>
+        [HttpGet("[action]")]
+        public IActionResult FindUsers(string searchString, int? page, int? take)
+        {
+            if (String.IsNullOrEmpty(searchString))
+            {
+                return BadRequest("строка поиска не должна быть пустой ");
+            }
+            List<UserShortViewModel> users = accountService.FindUsers(searchString);
+            int total = users.Count;
+            if (page != null && take != null)
+            {
+                users = users.Paginate((int)page, (int)take).ToList();
+            }
+            PaginationParams pgParams = new PaginationParams
+            {
+                total = total,
+                page = page,
+                skip = (page - 1) * take,
+                take = take,
+                totalPages = (int)Math.Ceiling((decimal)total / (take ?? 10))
+            };
+            return Json(new PaginationViewModel<UserShortViewModel>
+            {
+                values = users,
+                paginationParams = pgParams
+            });
         }
 
     }

@@ -131,5 +131,19 @@ namespace server.Services
             message = "доступ есть";
             return true;
         }
+        //поиск людей
+        public List<UserShortViewModel>FindUsers(string search)
+        {
+            return db.Users
+                .Include(x => x.Image)
+                .Where(x =>
+                EF.Functions.Like(x.Name + " " + x.Surname, $"%{search}%") ||
+                EF.Functions.Like(x.Nickname, $"%{search}%") ||
+                EF.Functions.Like(x.Name, $"%{search}%") ||
+                EF.Functions.Like(x.Surname, $"%{search}%")
+                )
+                .Select(x => new UserShortViewModel(x))
+                .ToList();
+        }
     }
 }

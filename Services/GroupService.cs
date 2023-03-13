@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Models;
+using server.ViewModels;
 
 namespace server.Services
 {
@@ -26,6 +27,21 @@ namespace server.Services
             {
                 return false;
             }
+        }
+        public List<GroupViewModel> FindGroup(string search)
+        {
+            return db.Groups
+                .Include(x => x.GroupImage)
+                .Where(x =>
+                    EF.Functions.Like(x.GroupName, $"%{search}%")
+                )
+                .Select(x => new GroupViewModel
+                {
+                    GroupId = x.GroupId,
+                    GroupName = x.GroupName,
+                    GroupImage = x.GroupImage.FileLink,
+                    IsPublic = x.IsPublic
+                }).ToList();
         }
         public bool CheckUserRole(int userId, int groupId)
         {

@@ -7,7 +7,9 @@ using NuGet.DependencyResolver;
 using server.Models;
 using server.Services;
 using server.ViewModels;
+using server.ViewModels.Additional;
 using System.Data.Common;
+using System.Drawing;
 
 namespace server.Controllers
 {
@@ -29,12 +31,75 @@ namespace server.Controllers
             return Json(db.Groups.Include(x => x.GroupImage).ToList());
         }
 
+        //изменить инфу группы
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ChangeInfo(GroupChangeInfoViewModel info)
+        {
+            try
+            {
+                Group? g = db.Groups.FirstOrDefault(x => x.GroupId == info.groupId);
+                if (g == null)
+                {
+                    return NotFound();
+                }
+                g.GroupName = info.groupName;
+                g.IsPublic = info.isPublic;
+                db.Groups.Update(g);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
+        }
+        /// <summary>
+        /// изменение автарки группы
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="newImageId"></param>
+        /// <returns></returns>
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ChangeGroupProfileImage(int groupId, int newImageId)
+        {
+
+            try
+            {
+                Group? group = db.Groups
+                .Include(x => x.GroupImage)
+                .FirstOrDefault(x => x.GroupId == groupId);
+                if (group == null)
+                {
+                    return NotFound("группа не найдена");
+                }
+                Models.File? newImage = db.Files.FirstOrDefault(x => x.FileId == newImageId);
+                if (newImage == null)
+                {
+                    return NotFound("файл не найден");
+                }
+                if (newImage.FileType.ToLower() != "image")
+                {
+                    return BadRequest("необходимо загружать изображения");
+                }
+                group.GroupImage.LogicalName = newImage.LogicalName;
+                group.GroupImage.PhysicalName = newImage.PhysicalName;
+                group.GroupImage.FileLink = newImage.FileLink;
+                group.GroupImage.PublicationDate = newImage.PublicationDate;
+                db.Files.Update(group.GroupImage);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
+        }
 
         //получить группу по ID
         [HttpGet("{groupId}")]
         public IActionResult GetGroup(int groupId)
         {
-            Group g = db.Groups.Include(x=>x.GroupImage).FirstOrDefault(x => x.GroupId == groupId);
+            Group? g = db.Groups.Include(x=>x.GroupImage).FirstOrDefault(x => x.GroupId == groupId);
 
             if (g == null)
             {
@@ -91,7 +156,13 @@ namespace server.Controllers
         [HttpGet("[action]/{groupId}")]
         public IActionResult GetGroupMembersByGroupId(int groupId)
         {
-            return Json(db.GroupMembers.FirstOrDefault(x => x.GroupId == groupId));
+            List<UserShortViewModel> groupMembers = db.GroupMembers
+                .Include(x=>x.GroupMemberRole)
+                .Include(x=>x.User.Image)
+                .Where(x => x.GroupId == groupId)
+                .Select(x=>new UserShortViewModel(x.User, x.GroupMemberRole))
+                .ToList();
+            return Json(groupMembers);
         }
 
 
@@ -134,26 +205,42 @@ namespace server.Controllers
 
 
 
-        //поиск групп по ключу
+        /// <summary>
+        /// поиск групп
+        /// </summary>
+        /// <param name="page">номер страницы
+        /// рассчет по формуле Count/Take (округлить вверх)
+        /// </param>
+        /// <param name="page">номер страницы
+        /// рассчет по формуле Count/Take (округлить вверх)
+        /// </param>
+        /// <returns></returns>
         [HttpGet("[action]")]
-        public IActionResult FindGroups(string search)
+        public IActionResult FindGroups(string searchString, int? page, int? skip, int? take)
         {
-            if(string.IsNullOrEmpty(search))
+            if (String.IsNullOrEmpty(searchString))
             {
-                return Json(Array.Empty<string>());
+                return BadRequest("строка поиска не должна быть пустой ");
             }
-            var groups = db.Groups
-                .Include(x => x.GroupImage)
-                .Where(x =>
-                    EF.Functions.Like(x.GroupName, $"%{search}%")
-                )
-                .Select(x=>new GroupViewModel { 
-                    GroupId=x.GroupId,
-                    GroupName=x.GroupName,
-                    GroupImage=x.GroupImage.FileLink,
-                    IsPublic=x.IsPublic
-                });
-            return Json(groups);
+            List<GroupViewModel> groups= groupService.FindGroup(searchString);
+            int total = groups.Count;
+            if (page != null && take != null )
+            {
+                    groups=groups.Paginate((int)page, (int)take).ToList();
+            }
+            PaginationParams pgParams = new PaginationParams
+            {
+                total= total,
+                page = page,
+                skip = skip,
+                take = take,
+                totalPages= (int)Math.Ceiling((decimal)total / (take??10))
+            };
+            return Json(new PaginationViewModel<GroupViewModel>
+            {
+                values=groups,
+                paginationParams= pgParams
+            });
         }
 
 

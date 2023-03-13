@@ -76,14 +76,17 @@ namespace server.Controllers
                 bool isUserBlocked = db.GroupBlockList.FirstOrDefault(x => x.BlockedUserId == model.BlockedUserId && x.GroupId == model.GroupId) != null;
                 if (isUserBlocked) { return Ok("пользователь уже заблокирован"); }
                 if (group == null || blockedUser == null) { return NotFound("не найден"); }
+                GroupMember? groupMember = db.GroupMembers.FirstOrDefault(x => x.GroupId == model.GroupId && x.UserId == model.BlockedUserId);
+                if (groupMember is null) return NotFound("пользователь не подписан на группу");
                 db.GroupBlockList.Add(new GroupBlockList
                 {
-                    BlockedUserId = model.BlockedUserId,
-                    GroupId = model.GroupId,
+                    BlockedUser=blockedUser,
+                    Group=group,
                     DateFrom = DateTime.Now,
                     DateTo = model.DateTo ?? DateTime.Now.AddYears(2),
                     Reason = model.Reason
                 });
+                db.GroupMembers.Remove(groupMember);
                 await db.SaveChangesAsync();
                 return Ok();
             }

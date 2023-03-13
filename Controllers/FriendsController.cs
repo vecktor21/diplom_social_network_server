@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using server.Models;
+using server.Services;
 using server.ViewModels;
+using System.Linq;
 
 namespace server.Controllers
 {
@@ -13,10 +15,12 @@ namespace server.Controllers
     public class FriendsController : Controller
     {
         private readonly ApplicationContext db;
+        private readonly AccountService accountService;
 
-        public FriendsController(ApplicationContext context)
+        public FriendsController(ApplicationContext context, AccountService accountService)
         {
             db = context;
+            this.accountService = accountService;
         }
         [HttpGet]
         public async Task<IActionResult> GetFriends(int userId)
@@ -25,22 +29,14 @@ namespace server.Controllers
             {
                 return BadRequest(ModelState);
             }
-            List<FriendViewModel> friends = new List<FriendViewModel>();
+            List<UserShortViewModel> friends = new List<UserShortViewModel>();
             friends.AddRange(db.Friends
                 .Where(x => x.User1Id != userId && x.User2Id == userId)
                 .Include(x=>x.User1)
                 .ThenInclude(x=>x.Role)
                 .Include(x => x.User1)
                 .ThenInclude(x => x.Image)
-                .Select(x => new FriendViewModel
-                {
-                    Name = x.User1.Name,
-                    Nickname = x.User1.Nickname,
-                    Surname = x.User1.Surname,
-                    ProfileImage = x.User1.Image.FileLink,
-                    UserId = x.User1.UserId
-
-                })
+                .Select(x => new UserShortViewModel(x.User1.UserId, x.User1.Name + " " + x.User1.Surname, x.User1.Image.FileLink))
                 .ToList());
             friends.AddRange(
                 db.Friends
@@ -49,15 +45,7 @@ namespace server.Controllers
                 .ThenInclude(x => x.Role)
                 .Include(x => x.User2)
                 .ThenInclude(x => x.Image)
-                .Select(x => new FriendViewModel
-                {
-                    Name = x.User2.Name,
-                    Nickname = x.User2.Nickname,
-                    Surname = x.User2.Surname,
-                    ProfileImage = x.User2.Image.FileLink,
-                    UserId = x.User2.UserId
-
-                })
+                .Select(x => new UserShortViewModel(x.User2.UserId, x.User2.Name + " " + x.User2.Surname, x.User2.Image.FileLink))
                 .ToList());
             return Json(friends);
         }
@@ -77,23 +65,7 @@ namespace server.Controllers
             {
                 return Json(Array.Empty<string>());
             }
-            List<FriendViewModel> foundUsers = db.Users
-                .Include(x=>x.Image)
-                .Where(x => 
-                EF.Functions.Like(x.Name + " " + x.Surname, $"%{search}%") || 
-                EF.Functions.Like(x.Nickname, $"%{search}%") ||
-                EF.Functions.Like(x.Name, $"%{search}%") ||
-                EF.Functions.Like(x.Surname, $"%{search}%")
-                )
-                .Select(x => new FriendViewModel 
-                { 
-                    Name = x.Name, 
-                    Nickname=x.Nickname, 
-                    Surname=x.Surname, 
-                    UserId=x.UserId,
-                    ProfileImage = x.Image.FileLink
-                })
-                .ToList();
+            List<UserShortViewModel> foundUsers = accountService.FindUsers(search);
             return Json(foundUsers);
         }
 

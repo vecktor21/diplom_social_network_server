@@ -21,6 +21,34 @@ namespace server.Controllers
             db = context;
         }
 
+
+        [HttpGet("[action]")]
+        public bool IsFavorite(int userId, int itemId, FavoriteTypes type)
+        {
+            bool isFavorite = false;
+            try
+            {
+                switch (type)
+                {
+                    case FavoriteTypes.Group:
+                        isFavorite = db.FavoriteGroups.Include(x => x.Favorite).Any(x => x.GroupId == itemId && x.Favorite.UserId == userId);
+                        break;
+                    case FavoriteTypes.Article:
+                        isFavorite = db.FavoriteArticles.Include(x => x.Favorite).Any(x => x.ArticleId == itemId && x.Favorite.UserId == userId);
+                        break;
+                    case FavoriteTypes.Post:
+                        isFavorite = db.FavoritePosts.Include(x => x.Favorite).Any(x => x.PostId == itemId && x.Favorite.UserId == userId);
+                        break;
+                    default: break;
+                }
+            }
+            catch 
+            {
+
+            }
+            return isFavorite;
+        }
+
         /// <summary>
         /// получить избранное пользователя по критериям
         /// </summary>
@@ -164,7 +192,7 @@ namespace server.Controllers
             }
         }
         /// <summary>
-        /// добавление группы в избранное
+        /// добавление поста в избранное
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="postId"></param>

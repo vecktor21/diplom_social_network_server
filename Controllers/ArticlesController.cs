@@ -7,6 +7,7 @@ using NuGet.Packaging.Signing;
 using server.Models;
 using server.Services;
 using server.ViewModels;
+using server.ViewModels.Additional;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -56,7 +57,7 @@ namespace server.Controllers
 
         //поиск статей
         [HttpGet("[action]")]
-        public List <ArticleViewModel> SearchArticles(string query)
+        public IActionResult SearchArticles(string query, int? page, int? take)
         {
             List<ArticleViewModel> searchResult = db.Articles
                 .Include(x => x.Author.Role)
@@ -93,10 +94,27 @@ namespace server.Controllers
                         .Select(x => new ArticleViewModel(x)));
                 }
             }
+            searchResult = searchResult.DistinctBy(x => x.ArticleId).ToList();
 
+            int total = searchResult.Count;
+            if (page != null && take != null)
+            {
+                searchResult = searchResult.Paginate((int)page, (int)take).ToList();
+            }
+            PaginationParams pgParams = new PaginationParams
+            {
+                total = total,
+                page = page,
+                skip = (page - 1) * take,
+                take = take,
+                totalPages = (int)Math.Ceiling((decimal)total / (take ?? 10))
+            };
+            return new JsonResult(new PaginationViewModel<ArticleViewModel>
+            {
+                values = searchResult,
+                paginationParams = pgParams
+            });
 
-            return searchResult.DistinctBy(x => x.ArticleId).ToList();
-                
         }
 
         //получение всех статей автора
