@@ -31,9 +31,36 @@ namespace server.Controllers
         }
         [HttpGet("users")]
         //[Authorize(Roles = "ADMIN")]
-        public async Task<IEnumerable<User>> GetUsers()
+        public IActionResult GetUsers()
         {
-            return await db.Users.ToListAsync();
+            List<UserViewModel> users = db.Users
+                    .Include(x => x.Role)
+                    .Include(x => x.Image)
+                    .Include(x=>x.UserStatus)
+                    .Select(x=>new UserViewModel(x))
+                    .ToList();
+            return Json(users);
+        }
+        [HttpPost("[action]")]
+        public async Task<IActionResult> SaveChanges(int userId, string role, string status)
+        {
+            User user = db.Users.Include(x=>x.Role).Include(x=>x.UserStatus).FirstOrDefault(x => x.UserId == userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.UserStatus.StatusName = status;
+            user.UserStatus.StatusFrom = DateTime.Now;
+            user.RoleId = db.UserRoles.FirstOrDefault(x => x.RoleName == role).UserRoleId;
+            try
+            {
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch(Exception e)
+            {
+                return BadRequest();
+            }
         }
         //проверка доступа к странице
         [HttpGet("[action]")]
@@ -226,9 +253,9 @@ namespace server.Controllers
             PaginationParams pgParams = new PaginationParams
             {
                 total = total,
-                page = page,
+                page = page??0,
                 skip = (page - 1) * take,
-                take = take,
+                take = take ?? total,
                 totalPages = (int)Math.Ceiling((decimal)total / (take ?? 10))
             };
             return Json(new PaginationViewModel<UserShortViewModel>

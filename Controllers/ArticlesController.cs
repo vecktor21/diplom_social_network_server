@@ -104,9 +104,9 @@ namespace server.Controllers
             PaginationParams pgParams = new PaginationParams
             {
                 total = total,
-                page = page,
+                page = page ?? 0,
                 skip = (page - 1) * take,
-                take = take,
+                take = take ?? total,
                 totalPages = (int)Math.Ceiling((decimal)total / (take ?? 10))
             };
             return new JsonResult(new PaginationViewModel<ArticleViewModel>
@@ -343,6 +343,8 @@ namespace server.Controllers
                     .Include(x => x.ArticleComments)
                     .ThenInclude(x => x.Comment.CommentAttachments)
                     .ThenInclude(x => x.File)
+                    .Include(x=>x.ArticleComments)
+                    .ThenInclude(x=>x.Comment.User.Image)
                     .Include(x => x.ArticlePages)
                     .ToList();
         }

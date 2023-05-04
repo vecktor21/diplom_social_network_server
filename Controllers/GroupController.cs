@@ -216,7 +216,7 @@ namespace server.Controllers
         /// </param>
         /// <returns></returns>
         [HttpGet("[action]")]
-        public IActionResult FindGroups(string searchString, int? page, int? skip, int? take)
+        public IActionResult FindGroups(string searchString, int? page, int? take)
         {
             if (String.IsNullOrEmpty(searchString))
             {
@@ -230,11 +230,11 @@ namespace server.Controllers
             }
             PaginationParams pgParams = new PaginationParams
             {
-                total= total,
-                page = page,
-                skip = skip,
-                take = take,
-                totalPages= (int)Math.Ceiling((decimal)total / (take??10))
+                total = total,
+                page = page ?? 0,
+                skip = (page - 1) * take,
+                take = take ?? total,
+                totalPages = (int)Math.Ceiling((decimal)total / (take??10))
             };
             return Json(new PaginationViewModel<GroupViewModel>
             {

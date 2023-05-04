@@ -26,6 +26,10 @@ namespace server.ViewModels
             this.Education = user.UserInfo.Education;
             this.UserInfoPrivacyType = user.UserInfo.UserInfoPrivacyType;
         }
+        public UserInfoViewModel()
+        {
+
+        }
 
     }
 }

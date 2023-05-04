@@ -92,6 +92,8 @@ namespace server.Controllers
                             .ThenInclude(x => x.Comment.CommentAttachments)
                             .ThenInclude(x => x.File)
                             .Include(x => x.Article.ArticlePages)
+                            .Include(x => x.Article.ArticleComments)
+                            .ThenInclude(x => x.Comment.User.Image)
                             .Where(x => x.Favorite.UserId == userId)
                             .Select(x => new ArticleViewModel(x.Article))
                             .ToList();
