@@ -32,8 +32,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationContext>(opts =>
 {
-
     opts.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+    opts.UseLoggerFactory(new LoggerFactory());
+    opts.EnableSensitiveDataLogging();
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -47,13 +48,14 @@ builder.Services.AddTransient<FileService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using(var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+    context.Database.Migrate();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 

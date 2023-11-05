@@ -230,12 +230,6 @@ namespace server.Migrations
                         column: x => x.FileId,
                         principalTable: "Files",
                         principalColumn: "FileId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupFiles_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "GroupId",
                         onDelete: ReferentialAction.NoAction);
                 });
 

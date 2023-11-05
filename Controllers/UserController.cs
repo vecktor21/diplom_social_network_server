@@ -29,6 +29,13 @@ namespace server.Controllers
             this.accountService = accountService;
             this.groupService = groupService;
         }
+        [HttpGet("[action]")]
+        //[Authorize(Roles = "ADMIN")]
+        public string Test()
+        {
+            return "WORKING";
+        }
+
         [HttpGet("users")]
         //[Authorize(Roles = "ADMIN")]
         public IActionResult GetUsers()

@@ -152,7 +152,7 @@ namespace server.Controllers
             {
                 try
                 {
-                    var validatedToken = accountService.ValidateToken(userToken.RefreshToken);
+                    var validatedToken = accountService.ValidateToken(userToken?.RefreshToken);
                     if(DateTime.UtcNow <= validatedToken.ValidTo)
                     {
                         List<JwtSecurityToken> tokens = accountService.CreateTokens(email: user.Email, login: user.Login, role: user.Role.RoleName);

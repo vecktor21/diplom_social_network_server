@@ -6,7 +6,7 @@ namespace server.Models
     {
         [Key]
         public int TokenId { get; set; }
-        public string RefreshToken { get; set; }
+        public string? RefreshToken { get; set; }
         public User User { get; set; }
     }
 }

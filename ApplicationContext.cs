@@ -145,7 +145,7 @@ namespace server
             UserToken token = new UserToken
             {
                 TokenId = 1,
-                RefreshToken = "some token"
+                RefreshToken = ""
             };
 
             builder.Entity<UserToken>().HasData(token);

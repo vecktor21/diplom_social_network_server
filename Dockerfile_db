@@ -1,0 +1,9 @@
+FROM mcr.microsoft.com/mssql/server:latest
+ENV SA_PASSWORD=!23Zxc456vbn789m
+ENV ACCEPT_EULA=Y
+#ENV  PATH=$PATH/opt/mssql-tools/bin
+EXPOSE 1433
+
+WORKDIR /src
+#COPY filldata.sql ./filldata.sql
+RUN (/opt/mssql/bin/sqlservr --accept-eula & ) | grep -q "Service Broker manager has started"

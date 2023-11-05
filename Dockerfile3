@@ -1,0 +1,22 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 as base
+RUN dotnet tool install --global dotnet-ef
+WORKDIR /app
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 as build
+WORKDIR /src
+RUN dotnet tool install --global dotnet-ef --version 6.0.0
+COPY "server.csproj" .
+RUN dotnet restore server.csproj
+ENV PATH=${PATH}:/root/.dotnet/tools/
+ENTRYPOINT ["/bin/bash"]
+#RUN dotnet ef database update -p ./server.csproj
+COPY . .
+RUN dotnet build server.csproj -o /build -c Release
+
+FROM build AS publish
+WORKDIR /src
+RUN dotnet publish -c Release -o /publish /p:UseAppHost=false
+
+FROM publish AS run
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "server.dll"]

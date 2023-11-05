@@ -1,0 +1,37 @@
+services:
+    server:
+        container_name: social_network_server
+        build:
+            context: ./
+        networks:
+            - social_network 
+        ports:
+            - 127.0.0.1:80:80
+        volumes:
+            - server_static_content:/publish/wwwroot
+    database:
+        container_name: social_network_db
+        hostname: social_network_db
+        image: mcr.microsoft.com/mssql/server:latest
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=!23Zxc456vbn789m
+            - MSSQL_PID=EXPRESS
+            #- export PATH="$PATH:/opt/mssql-tools/bin
+        networks:
+            - social_network
+        ports: 
+            - 127.0.0.1:1433:1433
+        volumes:
+            - db_data:/var/opt/mssql
+
+
+volumes:
+    server_static_content:
+    db_data:
+    
+networks:
+    social_network:
+        driver: bridge
+
+        
